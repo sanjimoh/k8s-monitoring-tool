@@ -66,7 +66,7 @@ func (kc *K8sClient) UpdatePodDeployment(deployment *models.PodDeployment) (*mod
 	deploymentsClient := kc.clientSet.AppsV1().Deployments(apiv1.NamespaceAll)
 
 	retryErr := retry.RetryOnConflict(retry.DefaultRetry, func() error {
-		result, getErr := deploymentsClient.Get("demo-deployment", metav1.GetOptions{})
+		result, getErr := deploymentsClient.Get(*deployment.Name, metav1.GetOptions{})
 		if getErr != nil {
 			return fmt.Errorf("Failed to get latest version of Deployment: %v", getErr)
 		}
