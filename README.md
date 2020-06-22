@@ -5,15 +5,17 @@ Kubernetes monitoring tool is meant for monitoring kubernetes resources in a clu
 The existing codebase - (more to come..)
 * Exposes a rest endpoint to it's client using which pod details including its current status could be retrieved from
   a cluster.
+* Now it is also possible to update a pod deployment through rest endpoints but support is limited to updating of pod 
+  deployment number of replicas and pod deployment container image name & version. Other update will be soon introduced.
 
 ## Exposed rest endpoints and payload details
 Existing codebase exposes the following endpoints -
-* /api/kmt/v1/pods
+* GET /api/kmt/v1/pods
   This endpoint will fetch all the pods & its status across all the k8s namespaces. 
   
-* /api/kmt/v1/pods?namespace=<provide_k8s_namespace_here>
+* GET /api/kmt/v1/pods?namespace=<provide_k8s_namespace_here>
   This endpoint will fetch all the pods for the given k8s namespaces
-  
+
 In both the above scenario, the returned response would look like something below -
     
   ```
@@ -39,7 +41,23 @@ In both the above scenario, the returned response would look like something belo
       ...
     ]
   ```
-  
+* PUT /api/kmt/v1/pod
+  This endpoint will update a given pod deployment in a kubernetes cluster. Current support is limited to updation of 
+  number of pod replicas and image name & version.
+  ```
+    PUT /api/kmt/v1/pod
+   ```
+
+    Sample request body will be:
+
+    ```
+    {
+      "name": "apache-cassandra",
+      "replicas": "5",
+      "image": "ccas-apache:2.5"
+    }
+  ```
+
 ## Technology Selection
 * [Golang](https://golang.org/) used for implementation.
 * [Go-Swagger](https://github.com/go-swagger/go-swagger) is used for rest service Swaggerization.
