@@ -1,0 +1,111 @@
+swagger: "2.0"
+info:
+  title: Kubernetes Monitoring Tool (KMT)
+  description: KMT provides rest endpoints to help clients to get monitoring data from a Kubernetes cluster.
+  version: "1.0.0"
+
+basePath: /api/kmt
+schemes:
+  - http
+
+paths:
+  /v1/pods:
+    get:
+      summary: Gets all pods statistics running in the k8s cluster
+      tags:
+        - k8s-monitoring-tool
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      parameters:
+        - in: query
+          name: namespace
+          type: string
+          required: false
+          description: Pass if pods status for a specific namespace is desired; otherwise all pods across all namespaces are returned.
+      description: |
+        For example:
+        ```
+        GET /api/kmt/v1/pods
+        GET /api/kmt/v1/pods?namespace=databricks
+        ```
+
+        Returns list of pods with their status:
+        ```
+        [
+          {
+              "name": "pod-1",
+              "status": "running",
+              "nodeId": "node01"
+          },
+          {
+              "name": "pod-2",
+              "status": "CrashLoopBackOff",
+              "nodeId": "node02"
+          },
+          ...
+          ...
+        ]
+        ```
+      responses:
+        '200':
+          description: Fetching of all pod status is successful.
+          schema:
+            $ref: "#/definitions/Pods"
+        '500':
+          description: Internal server error
+          schema:
+            $ref: "#/definitions/Error"
+
+definitions:
+  Pod:
+    type: object
+    description: A pod
+    required:
+      - name
+      - status
+    properties:
+      name:
+        type: string
+        description: Pod name
+      status:
+        type: object
+        description: Pod status
+        $ref: "#/definitions/PodStatus"
+  PodStatus:
+    type: object
+    description: A pod
+    required:
+      - phase
+      - description
+      - podIp
+      - hostIp
+    properties:
+      phase:
+        type: string
+        description: The phase of a Pod is a simple, high-level summary of where the Pod is in its lifecycle (Pending, Running, Failed, Unknown)
+      description:
+        type: string
+        description: Details about why the pod is in this condition.
+      podIp:
+        type: string
+        description: IP address allocated to the pod
+      hostIp:
+        type: string
+        description: IP address of the host to which the pod is assigned
+  Pods:
+    type: array
+    description: Array of pod items
+    items:
+      $ref: "#/definitions/Pod"
+  Error:
+    type: object
+    required:
+      - code
+      - message
+    properties:
+      code:
+        type: integer
+      message:
+        type: string
