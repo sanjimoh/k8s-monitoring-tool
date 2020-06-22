@@ -21,3 +21,12 @@ func (kmh *K8sMonitoringHandler) GetV1Pods(namespace string) (pods models.Pods, 
 
 	return
 }
+
+func (kmh *K8sMonitoringHandler) PutV1Pod(deployment *models.PodDeployment) (pods *models.PodDeployment, err error) {
+	pods, err = kmh.k8sClient.UpdatePodDeployment(deployment)
+	if err != nil {
+		return nil, fmt.Errorf("Update to pod deployment failed: %s", err)
+	}
+
+	return
+}

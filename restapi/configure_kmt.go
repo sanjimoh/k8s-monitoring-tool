@@ -62,6 +62,18 @@ func configureAPI(api *operations.KmtAPI) http.Handler {
 		return k8s_monitoring_tool.NewGetV1PodsOK().WithPayload(pods)
 	})
 
+	api.K8sMonitoringToolPutV1PodHandler = k8s_monitoring_tool.PutV1PodHandlerFunc(func(params k8s_monitoring_tool.PutV1PodParams) middleware.Responder {
+		podDeployment, err := KMC.MonitoringHandler.PutV1Pod(params.PodDeployment)
+		if err != nil {
+			return k8s_monitoring_tool.NewPutV1PodInternalServerError().WithPayload(&models.Error{
+				Code:    swag.Int64(500),
+				Message: swag.String(err.Error()),
+			})
+		}
+
+		return k8s_monitoring_tool.NewPutV1PodOK().WithPayload(podDeployment)
+	})
+
 	api.PreServerShutdown = func() {}
 
 	api.ServerShutdown = func() {}

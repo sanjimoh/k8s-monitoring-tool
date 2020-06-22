@@ -65,6 +65,50 @@ paths:
           schema:
             $ref: "#/definitions/Error"
 
+  /v1/pod:
+    put:
+      summary: Update a pod configuration running in the k8s cluster
+      tags:
+        - k8s-monitoring-tool
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: PodDeployment
+          description: New Pod deployment request body.
+          schema:
+            $ref: '#/definitions/PodDeployment'
+      description: |
+        For example:
+        ```
+        PUT /api/kmt/v1/pod
+        ```
+
+        Sample request body will be:
+
+        ```
+        {
+          "name": "apache-cassandra",
+          "replicas": "5",
+          "image": "ccas-apache:2.5"
+        }
+        ```
+      responses:
+        '200':
+          description: Pod deployment updated successfully.
+          schema:
+            $ref: '#/definitions/PodDeployment'
+        '400':
+          description: Bad Request, Unable to update pod deployment.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal server error.
+          schema:
+            $ref: '#/definitions/Error'
+
 definitions:
   Pod:
     type: object
@@ -101,6 +145,23 @@ definitions:
       hostIp:
         type: string
         description: IP address of the host to which the pod is assigned
+  PodDeployment:
+    type: object
+    description: A pod deployment to update
+    required:
+      - name
+      - replicas
+      - image
+    properties:
+      name:
+        type: string
+        description: Provide the name of the pod deployment.
+      replicas:
+        type: string
+        description: Provide the number of replicas to modify.
+      image:
+        type: string
+        description: Provide the new image name, version.
   Pods:
     type: array
     description: Array of pod items

@@ -46,6 +46,9 @@ func NewKmtAPI(spec *loads.Document) *KmtAPI {
 		K8sMonitoringToolGetV1PodsHandler: k8s_monitoring_tool.GetV1PodsHandlerFunc(func(params k8s_monitoring_tool.GetV1PodsParams) middleware.Responder {
 			return middleware.NotImplemented("operation k8s_monitoring_tool.GetV1Pods has not yet been implemented")
 		}),
+		K8sMonitoringToolPutV1PodHandler: k8s_monitoring_tool.PutV1PodHandlerFunc(func(params k8s_monitoring_tool.PutV1PodParams) middleware.Responder {
+			return middleware.NotImplemented("operation k8s_monitoring_tool.PutV1Pod has not yet been implemented")
+		}),
 	}
 }
 
@@ -81,6 +84,8 @@ type KmtAPI struct {
 
 	// K8sMonitoringToolGetV1PodsHandler sets the operation handler for the get v1 pods operation
 	K8sMonitoringToolGetV1PodsHandler k8s_monitoring_tool.GetV1PodsHandler
+	// K8sMonitoringToolPutV1PodHandler sets the operation handler for the put v1 pod operation
+	K8sMonitoringToolPutV1PodHandler k8s_monitoring_tool.PutV1PodHandler
 	// ServeError is called when an error is received, there is a default handler
 	// but you can set your own with this
 	ServeError func(http.ResponseWriter, *http.Request, error)
@@ -149,6 +154,9 @@ func (o *KmtAPI) Validate() error {
 
 	if o.K8sMonitoringToolGetV1PodsHandler == nil {
 		unregistered = append(unregistered, "k8s_monitoring_tool.GetV1PodsHandler")
+	}
+	if o.K8sMonitoringToolPutV1PodHandler == nil {
+		unregistered = append(unregistered, "k8s_monitoring_tool.PutV1PodHandler")
 	}
 
 	if len(unregistered) > 0 {
@@ -242,6 +250,10 @@ func (o *KmtAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/v1/pods"] = k8s_monitoring_tool.NewGetV1Pods(o.context, o.K8sMonitoringToolGetV1PodsHandler)
+	if o.handlers["PUT"] == nil {
+		o.handlers["PUT"] = make(map[string]http.Handler)
+	}
+	o.handlers["PUT"]["/v1/pod"] = k8s_monitoring_tool.NewPutV1Pod(o.context, o.K8sMonitoringToolPutV1PodHandler)
 }
 
 // Serve creates a http handler to serve the API over HTTP

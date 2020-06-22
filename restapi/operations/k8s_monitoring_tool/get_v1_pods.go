@@ -43,16 +43,23 @@ Returns list of pods with their status:
 ```
 [
   {
-      "name": "pod-1",
-      "status": "running",
-      "nodeId": "node01"
+    "name": "pod-1",
+    "status": {
+      "phase": "Running",
+      "description": "Pod is running",
+      "podIp": "192.1.1.1",
+      "hostIp": "string"
+    }
   },
   {
-      "name": "pod-2",
-      "status": "CrashLoopBackOff",
-      "nodeId": "node02"
+    "name": "pod-2",
+    "status": {
+      "phase": "Pending",
+      "description": "Pending due to lack of resources",
+      "podIp": "",
+      "hostIp": ""
+    }
   },
-  ...
   ...
 ]
 ```

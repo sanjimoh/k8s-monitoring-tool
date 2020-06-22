@@ -29,9 +29,54 @@ func init() {
   },
   "basePath": "/api/kmt",
   "paths": {
+    "/v1/pod": {
+      "put": {
+        "description": "For example:\n` + "`" + `` + "`" + `` + "`" + `\nPUT /api/kmt/v1/pod\n` + "`" + `` + "`" + `` + "`" + `\n\nSample request body will be:\n\n` + "`" + `` + "`" + `` + "`" + `\n{\n  \"name\": \"apache-cassandra\",\n  \"replicas\": \"5\",\n  \"image\": \"ccas-apache:2.5\"\n}\n` + "`" + `` + "`" + `` + "`" + `\n",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "k8s-monitoring-tool"
+        ],
+        "summary": "Update a pod configuration running in the k8s cluster",
+        "parameters": [
+          {
+            "description": "New Pod deployment request body.",
+            "name": "PodDeployment",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/PodDeployment"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Pod deployment updated successfully.",
+            "schema": {
+              "$ref": "#/definitions/PodDeployment"
+            }
+          },
+          "400": {
+            "description": "Bad Request, Unable to update pod deployment.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
     "/v1/pods": {
       "get": {
-        "description": "For example:\n` + "`" + `` + "`" + `` + "`" + `\nGET /api/kmt/v1/pods\nGET /api/kmt/v1/pods?namespace=databricks\n` + "`" + `` + "`" + `` + "`" + `\n\nReturns list of pods with their status:\n` + "`" + `` + "`" + `` + "`" + `\n[\n  {\n      \"name\": \"pod-1\",\n      \"status\": \"running\",\n      \"nodeId\": \"node01\"\n  },\n  {\n      \"name\": \"pod-2\",\n      \"status\": \"CrashLoopBackOff\",\n      \"nodeId\": \"node02\"\n  },\n  ...\n  ...\n]\n` + "`" + `` + "`" + `` + "`" + `\n",
+        "description": "For example:\n` + "`" + `` + "`" + `` + "`" + `\nGET /api/kmt/v1/pods\nGET /api/kmt/v1/pods?namespace=databricks\n` + "`" + `` + "`" + `` + "`" + `\n\nReturns list of pods with their status:\n` + "`" + `` + "`" + `` + "`" + `\n[\n  {\n    \"name\": \"pod-1\",\n    \"status\": {\n      \"phase\": \"Running\",\n      \"description\": \"Pod is running\",\n      \"podIp\": \"192.1.1.1\",\n      \"hostIp\": \"string\"\n    }\n  },\n  {\n    \"name\": \"pod-2\",\n    \"status\": {\n      \"phase\": \"Pending\",\n      \"description\": \"Pending due to lack of resources\",\n      \"podIp\": \"\",\n      \"hostIp\": \"\"\n    }\n  },\n  ...\n]\n` + "`" + `` + "`" + `` + "`" + `\n",
         "consumes": [
           "application/json"
         ],
@@ -99,6 +144,29 @@ func init() {
           "description": "Pod status",
           "type": "object",
           "$ref": "#/definitions/PodStatus"
+        }
+      }
+    },
+    "PodDeployment": {
+      "description": "A pod deployment to update",
+      "type": "object",
+      "required": [
+        "name",
+        "replicas",
+        "image"
+      ],
+      "properties": {
+        "image": {
+          "description": "Provide the new image name, version.",
+          "type": "string"
+        },
+        "name": {
+          "description": "Provide the name of the pod deployment.",
+          "type": "string"
+        },
+        "replicas": {
+          "description": "Provide the number of replicas to modify.",
+          "type": "string"
         }
       }
     },
@@ -151,9 +219,54 @@ func init() {
   },
   "basePath": "/api/kmt",
   "paths": {
+    "/v1/pod": {
+      "put": {
+        "description": "For example:\n` + "`" + `` + "`" + `` + "`" + `\nPUT /api/kmt/v1/pod\n` + "`" + `` + "`" + `` + "`" + `\n\nSample request body will be:\n\n` + "`" + `` + "`" + `` + "`" + `\n{\n  \"name\": \"apache-cassandra\",\n  \"replicas\": \"5\",\n  \"image\": \"ccas-apache:2.5\"\n}\n` + "`" + `` + "`" + `` + "`" + `\n",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "k8s-monitoring-tool"
+        ],
+        "summary": "Update a pod configuration running in the k8s cluster",
+        "parameters": [
+          {
+            "description": "New Pod deployment request body.",
+            "name": "PodDeployment",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/PodDeployment"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Pod deployment updated successfully.",
+            "schema": {
+              "$ref": "#/definitions/PodDeployment"
+            }
+          },
+          "400": {
+            "description": "Bad Request, Unable to update pod deployment.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
     "/v1/pods": {
       "get": {
-        "description": "For example:\n` + "`" + `` + "`" + `` + "`" + `\nGET /api/kmt/v1/pods\nGET /api/kmt/v1/pods?namespace=databricks\n` + "`" + `` + "`" + `` + "`" + `\n\nReturns list of pods with their status:\n` + "`" + `` + "`" + `` + "`" + `\n[\n  {\n      \"name\": \"pod-1\",\n      \"status\": \"running\",\n      \"nodeId\": \"node01\"\n  },\n  {\n      \"name\": \"pod-2\",\n      \"status\": \"CrashLoopBackOff\",\n      \"nodeId\": \"node02\"\n  },\n  ...\n  ...\n]\n` + "`" + `` + "`" + `` + "`" + `\n",
+        "description": "For example:\n` + "`" + `` + "`" + `` + "`" + `\nGET /api/kmt/v1/pods\nGET /api/kmt/v1/pods?namespace=databricks\n` + "`" + `` + "`" + `` + "`" + `\n\nReturns list of pods with their status:\n` + "`" + `` + "`" + `` + "`" + `\n[\n  {\n    \"name\": \"pod-1\",\n    \"status\": {\n      \"phase\": \"Running\",\n      \"description\": \"Pod is running\",\n      \"podIp\": \"192.1.1.1\",\n      \"hostIp\": \"string\"\n    }\n  },\n  {\n    \"name\": \"pod-2\",\n    \"status\": {\n      \"phase\": \"Pending\",\n      \"description\": \"Pending due to lack of resources\",\n      \"podIp\": \"\",\n      \"hostIp\": \"\"\n    }\n  },\n  ...\n]\n` + "`" + `` + "`" + `` + "`" + `\n",
         "consumes": [
           "application/json"
         ],
@@ -221,6 +334,29 @@ func init() {
           "description": "Pod status",
           "type": "object",
           "$ref": "#/definitions/PodStatus"
+        }
+      }
+    },
+    "PodDeployment": {
+      "description": "A pod deployment to update",
+      "type": "object",
+      "required": [
+        "name",
+        "replicas",
+        "image"
+      ],
+      "properties": {
+        "image": {
+          "description": "Provide the new image name, version.",
+          "type": "string"
+        },
+        "name": {
+          "description": "Provide the name of the pod deployment.",
+          "type": "string"
+        },
+        "replicas": {
+          "description": "Provide the number of replicas to modify.",
+          "type": "string"
         }
       }
     },
