@@ -24,7 +24,7 @@ In both the above scenario, the returned response would look like something belo
           "phase": "Running",
           "description": "Pod is running",
           "podIp": "192.1.1.1",
-          "hostIp": "string"
+          "hostIp": "192.1.1.10"
         }
       },
       {
