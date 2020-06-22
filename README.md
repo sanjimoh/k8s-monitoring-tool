@@ -81,4 +81,3 @@ In both the above scenario, the returned response would look like something belo
 * [Golang](https://golang.org/) used for implementation.
 * [Go-Swagger](https://github.com/go-swagger/go-swagger) is used for rest service Swaggerization.
 * [client-go](https://github.com/kubernetes/client-go) is used for talking to kubernetes cluster.
-* [client-go](https://github.com/kubernetes/client-go) is used for talking to kubernetes cluster.
