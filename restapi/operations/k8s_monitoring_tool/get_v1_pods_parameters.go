@@ -30,6 +30,14 @@ type GetV1PodsParams struct {
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
 
+	/*Pass if you wish to fetch pods which are breaching the given cpuThreshold.
+	  In: query
+	*/
+	CPUThreshold *string
+	/*Pass byte value as string. Pass if you wish to fetch pods which are breaching the given memoryThreshold.
+	  In: query
+	*/
+	MemoryThreshold *string
 	/*Pass if pods status for a specific namespace is desired; otherwise all pods across all namespaces are returned.
 	  In: query
 	*/
@@ -47,6 +55,16 @@ func (o *GetV1PodsParams) BindRequest(r *http.Request, route *middleware.Matched
 
 	qs := runtime.Values(r.URL.Query())
 
+	qCPUThreshold, qhkCPUThreshold, _ := qs.GetOK("cpuThreshold")
+	if err := o.bindCPUThreshold(qCPUThreshold, qhkCPUThreshold, route.Formats); err != nil {
+		res = append(res, err)
+	}
+
+	qMemoryThreshold, qhkMemoryThreshold, _ := qs.GetOK("memoryThreshold")
+	if err := o.bindMemoryThreshold(qMemoryThreshold, qhkMemoryThreshold, route.Formats); err != nil {
+		res = append(res, err)
+	}
+
 	qNamespace, qhkNamespace, _ := qs.GetOK("namespace")
 	if err := o.bindNamespace(qNamespace, qhkNamespace, route.Formats); err != nil {
 		res = append(res, err)
@@ -55,6 +73,42 @@ func (o *GetV1PodsParams) BindRequest(r *http.Request, route *middleware.Matched
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+// bindCPUThreshold binds and validates parameter CPUThreshold from query.
+func (o *GetV1PodsParams) bindCPUThreshold(rawData []string, hasKey bool, formats strfmt.Registry) error {
+	var raw string
+	if len(rawData) > 0 {
+		raw = rawData[len(rawData)-1]
+	}
+
+	// Required: false
+	// AllowEmptyValue: false
+	if raw == "" { // empty values pass all other validations
+		return nil
+	}
+
+	o.CPUThreshold = &raw
+
+	return nil
+}
+
+// bindMemoryThreshold binds and validates parameter MemoryThreshold from query.
+func (o *GetV1PodsParams) bindMemoryThreshold(rawData []string, hasKey bool, formats strfmt.Registry) error {
+	var raw string
+	if len(rawData) > 0 {
+		raw = rawData[len(rawData)-1]
+	}
+
+	// Required: false
+	// AllowEmptyValue: false
+	if raw == "" { // empty values pass all other validations
+		return nil
+	}
+
+	o.MemoryThreshold = &raw
+
 	return nil
 }
 

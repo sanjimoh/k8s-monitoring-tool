@@ -24,11 +24,22 @@ paths:
           type: string
           required: false
           description: Pass if pods status for a specific namespace is desired; otherwise all pods across all namespaces are returned.
+        - in: query
+          name: cpuThreshold
+          type: string
+          required: false
+          description: Pass if you wish to fetch pods which are breaching the given cpuThreshold.
+        - in: query
+          name: memoryThreshold
+          type: string
+          required: false
+          description: Pass byte value as string. Pass if you wish to fetch pods which are breaching the given memoryThreshold.
       description: |
         For example:
         ```
         GET /api/kmt/v1/pods
         GET /api/kmt/v1/pods?namespace=databricks
+        GET /api/kmt/v1/pods?namespace=databricks&cpuThreshold=3&memoryThreshold=1073741824
         ```
 
         Returns list of pods with their status:
@@ -41,7 +52,14 @@ paths:
               "description": "Pod is running",
               "podIp": "192.1.1.1",
               "hostIp": "string"
-            }
+            },
+            "containers": [
+               {
+                 "name": "container-0",
+                 "currentCpuUsage": "",
+                 "currentMemoryUsage": ""
+               }
+             ]
           },
           {
             "name": "pod-2",
@@ -50,7 +68,14 @@ paths:
               "description": "Pending due to lack of resources",
               "podIp": "",
               "hostIp": ""
-            }
+            },
+           "containers": [
+              {
+                "name": "container-1",
+                "currentCpuUsage": "",
+                "currentMemoryUsage": ""
+              }
+            ]
           },
           ...
         ]
@@ -115,15 +140,24 @@ definitions:
     description: A pod
     required:
       - name
+      - namespace
       - status
+      - containers
     properties:
       name:
         type: string
         description: Pod name
+      namespace:
+        type: string
+        description: Namespace in which Pod exists
       status:
         type: object
         description: Pod status
         $ref: "#/definitions/PodStatus"
+      containers:
+        type: object
+        description: Pod containers
+        $ref: "#/definitions/PodContainers"
   PodStatus:
     type: object
     description: A pod
@@ -145,6 +179,28 @@ definitions:
       hostIp:
         type: string
         description: IP address of the host to which the pod is assigned
+  PodContainers:
+    type: array
+    description: Array of pod container
+    items:
+      $ref: "#/definitions/PodContainer"
+  PodContainer:
+    type: object
+    description: A pod container
+    required:
+      - name
+      - currentCpuUsage
+      - currentMemoryUsage
+    properties:
+      name:
+        type: string
+        description: Name of the container
+      currentCpuUsage:
+        type: string
+        description: Current CPU usage of the container.
+      currentMemoryUsage:
+        type: string
+        description: Current memory usage of the container.
   PodDeployment:
     type: object
     description: A pod deployment to update

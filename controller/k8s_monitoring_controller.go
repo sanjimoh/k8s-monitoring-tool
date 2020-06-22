@@ -10,11 +10,14 @@ type K8sMonitoringController struct {
 }
 
 func NewK8sMonitoringController() (*K8sMonitoringController, error) {
-	kubernetesClient := handler.NewK8sClient()
+	kubernetesClient, err := handler.NewK8sClient()
+	if err != nil {
+		return nil, fmt.Errorf("Creating k8s client failed: %v", err)
+	}
 
 	handler, err := handler.NewK8sMonitoringHandler(kubernetesClient)
 	if err != nil {
-		return nil, fmt.Errorf("Creating k8s monitoring handler failed: %s", err)
+		return nil, fmt.Errorf("Creating k8s monitoring handler failed: %v", err)
 	}
 
 	return &K8sMonitoringController{MonitoringHandler: handler}, nil

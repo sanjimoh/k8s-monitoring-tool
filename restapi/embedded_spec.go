@@ -76,7 +76,7 @@ func init() {
     },
     "/v1/pods": {
       "get": {
-        "description": "For example:\n` + "`" + `` + "`" + `` + "`" + `\nGET /api/kmt/v1/pods\nGET /api/kmt/v1/pods?namespace=databricks\n` + "`" + `` + "`" + `` + "`" + `\n\nReturns list of pods with their status:\n` + "`" + `` + "`" + `` + "`" + `\n[\n  {\n    \"name\": \"pod-1\",\n    \"status\": {\n      \"phase\": \"Running\",\n      \"description\": \"Pod is running\",\n      \"podIp\": \"192.1.1.1\",\n      \"hostIp\": \"string\"\n    }\n  },\n  {\n    \"name\": \"pod-2\",\n    \"status\": {\n      \"phase\": \"Pending\",\n      \"description\": \"Pending due to lack of resources\",\n      \"podIp\": \"\",\n      \"hostIp\": \"\"\n    }\n  },\n  ...\n]\n` + "`" + `` + "`" + `` + "`" + `\n",
+        "description": "For example:\n` + "`" + `` + "`" + `` + "`" + `\nGET /api/kmt/v1/pods\nGET /api/kmt/v1/pods?namespace=databricks\nGET /api/kmt/v1/pods?namespace=databricks\u0026cpuThreshold=3\u0026memoryThreshold=1073741824\n` + "`" + `` + "`" + `` + "`" + `\n\nReturns list of pods with their status:\n` + "`" + `` + "`" + `` + "`" + `\n[\n  {\n    \"name\": \"pod-1\",\n    \"status\": {\n      \"phase\": \"Running\",\n      \"description\": \"Pod is running\",\n      \"podIp\": \"192.1.1.1\",\n      \"hostIp\": \"string\"\n    }\n  },\n  {\n    \"name\": \"pod-2\",\n    \"status\": {\n      \"phase\": \"Pending\",\n      \"description\": \"Pending due to lack of resources\",\n      \"podIp\": \"\",\n      \"hostIp\": \"\"\n    }\n  },\n  ...\n]\n` + "`" + `` + "`" + `` + "`" + `\n",
         "consumes": [
           "application/json"
         ],
@@ -92,6 +92,18 @@ func init() {
             "type": "string",
             "description": "Pass if pods status for a specific namespace is desired; otherwise all pods across all namespaces are returned.",
             "name": "namespace",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Pass if you wish to fetch pods which are breaching the given cpuThreshold.",
+            "name": "cpuThreshold",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Pass byte value as string. Pass if you wish to fetch pods which are breaching the given memoryThreshold.",
+            "name": "memoryThreshold",
             "in": "query"
           }
         ],
@@ -133,11 +145,22 @@ func init() {
       "type": "object",
       "required": [
         "name",
-        "status"
+        "namespace",
+        "status",
+        "containers"
       ],
       "properties": {
+        "containers": {
+          "description": "Pod containers",
+          "type": "object",
+          "$ref": "#/definitions/PodContainers"
+        },
         "name": {
           "description": "Pod name",
+          "type": "string"
+        },
+        "namespace": {
+          "description": "Namespace in which Pod exists",
           "type": "string"
         },
         "status": {
@@ -145,6 +168,36 @@ func init() {
           "type": "object",
           "$ref": "#/definitions/PodStatus"
         }
+      }
+    },
+    "PodContainer": {
+      "description": "A pod container",
+      "type": "object",
+      "required": [
+        "name",
+        "currentCpuUsage",
+        "currentMemoryUsage"
+      ],
+      "properties": {
+        "currentCpuUsage": {
+          "description": "Current CPU usage of the container.",
+          "type": "string"
+        },
+        "currentMemoryUsage": {
+          "description": "Current memory usage of the container.",
+          "type": "string"
+        },
+        "name": {
+          "description": "Name of the container",
+          "type": "string"
+        }
+      }
+    },
+    "PodContainers": {
+      "description": "Array of pod container",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/PodContainer"
       }
     },
     "PodDeployment": {
@@ -266,7 +319,7 @@ func init() {
     },
     "/v1/pods": {
       "get": {
-        "description": "For example:\n` + "`" + `` + "`" + `` + "`" + `\nGET /api/kmt/v1/pods\nGET /api/kmt/v1/pods?namespace=databricks\n` + "`" + `` + "`" + `` + "`" + `\n\nReturns list of pods with their status:\n` + "`" + `` + "`" + `` + "`" + `\n[\n  {\n    \"name\": \"pod-1\",\n    \"status\": {\n      \"phase\": \"Running\",\n      \"description\": \"Pod is running\",\n      \"podIp\": \"192.1.1.1\",\n      \"hostIp\": \"string\"\n    }\n  },\n  {\n    \"name\": \"pod-2\",\n    \"status\": {\n      \"phase\": \"Pending\",\n      \"description\": \"Pending due to lack of resources\",\n      \"podIp\": \"\",\n      \"hostIp\": \"\"\n    }\n  },\n  ...\n]\n` + "`" + `` + "`" + `` + "`" + `\n",
+        "description": "For example:\n` + "`" + `` + "`" + `` + "`" + `\nGET /api/kmt/v1/pods\nGET /api/kmt/v1/pods?namespace=databricks\nGET /api/kmt/v1/pods?namespace=databricks\u0026cpuThreshold=3\u0026memoryThreshold=1073741824\n` + "`" + `` + "`" + `` + "`" + `\n\nReturns list of pods with their status:\n` + "`" + `` + "`" + `` + "`" + `\n[\n  {\n    \"name\": \"pod-1\",\n    \"status\": {\n      \"phase\": \"Running\",\n      \"description\": \"Pod is running\",\n      \"podIp\": \"192.1.1.1\",\n      \"hostIp\": \"string\"\n    }\n  },\n  {\n    \"name\": \"pod-2\",\n    \"status\": {\n      \"phase\": \"Pending\",\n      \"description\": \"Pending due to lack of resources\",\n      \"podIp\": \"\",\n      \"hostIp\": \"\"\n    }\n  },\n  ...\n]\n` + "`" + `` + "`" + `` + "`" + `\n",
         "consumes": [
           "application/json"
         ],
@@ -282,6 +335,18 @@ func init() {
             "type": "string",
             "description": "Pass if pods status for a specific namespace is desired; otherwise all pods across all namespaces are returned.",
             "name": "namespace",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Pass if you wish to fetch pods which are breaching the given cpuThreshold.",
+            "name": "cpuThreshold",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Pass byte value as string. Pass if you wish to fetch pods which are breaching the given memoryThreshold.",
+            "name": "memoryThreshold",
             "in": "query"
           }
         ],
@@ -323,11 +388,22 @@ func init() {
       "type": "object",
       "required": [
         "name",
-        "status"
+        "namespace",
+        "status",
+        "containers"
       ],
       "properties": {
+        "containers": {
+          "description": "Pod containers",
+          "type": "object",
+          "$ref": "#/definitions/PodContainers"
+        },
         "name": {
           "description": "Pod name",
+          "type": "string"
+        },
+        "namespace": {
+          "description": "Namespace in which Pod exists",
           "type": "string"
         },
         "status": {
@@ -335,6 +411,36 @@ func init() {
           "type": "object",
           "$ref": "#/definitions/PodStatus"
         }
+      }
+    },
+    "PodContainer": {
+      "description": "A pod container",
+      "type": "object",
+      "required": [
+        "name",
+        "currentCpuUsage",
+        "currentMemoryUsage"
+      ],
+      "properties": {
+        "currentCpuUsage": {
+          "description": "Current CPU usage of the container.",
+          "type": "string"
+        },
+        "currentMemoryUsage": {
+          "description": "Current memory usage of the container.",
+          "type": "string"
+        },
+        "name": {
+          "description": "Name of the container",
+          "type": "string"
+        }
+      }
+    },
+    "PodContainers": {
+      "description": "Array of pod container",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/PodContainer"
       }
     },
     "PodDeployment": {

@@ -37,6 +37,7 @@ For example:
 ```
 GET /api/kmt/v1/pods
 GET /api/kmt/v1/pods?namespace=databricks
+GET /api/kmt/v1/pods?namespace=databricks&cpuThreshold=3&memoryThreshold=1073741824
 ```
 
 Returns list of pods with their status:

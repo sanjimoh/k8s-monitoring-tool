@@ -43,20 +43,29 @@ func configureAPI(api *operations.KmtAPI) http.Handler {
 		}
 	}
 
+	// API handling for get all pod status & pods which are breaching cpu/memory thresholds
 	api.K8sMonitoringToolGetV1PodsHandler = k8s_monitoring_tool.GetV1PodsHandlerFunc(func(params k8s_monitoring_tool.GetV1PodsParams) middleware.Responder {
-		var ns string
-		if params.Namespace == nil {
-			ns = ""
-		} else {
-			ns = *params.Namespace
-		}
+		var pods models.Pods
+		var err error
 
-		pods, err := KMC.MonitoringHandler.GetV1Pods(ns)
-		if err != nil {
-			return k8s_monitoring_tool.NewGetV1PodsInternalServerError().WithPayload(&models.Error{
-				Code:    swag.Int64(500),
-				Message: swag.String(err.Error()),
-			})
+		namespace, cpuLimit, memoryLimit := validateAndSetParams(params)
+
+		if len(cpuLimit) == 0 && len(memoryLimit) == 0 {
+			pods, err = KMC.MonitoringHandler.GetV1Pods(namespace)
+			if err != nil {
+				return k8s_monitoring_tool.NewGetV1PodsInternalServerError().WithPayload(&models.Error{
+					Code:    swag.Int64(500),
+					Message: swag.String(err.Error()),
+				})
+			}
+		} else {
+			pods, err = KMC.MonitoringHandler.GetV1PodsUnderLoad(namespace, cpuLimit, memoryLimit)
+			if err != nil {
+				return k8s_monitoring_tool.NewGetV1PodsInternalServerError().WithPayload(&models.Error{
+					Code:    swag.Int64(500),
+					Message: swag.String(err.Error()),
+				})
+			}
 		}
 
 		return k8s_monitoring_tool.NewGetV1PodsOK().WithPayload(pods)
@@ -79,6 +88,35 @@ func configureAPI(api *operations.KmtAPI) http.Handler {
 	api.ServerShutdown = func() {}
 
 	return setupGlobalMiddleware(api.Serve(setupMiddlewares))
+}
+
+func validateAndSetParams(params k8s_monitoring_tool.GetV1PodsParams) (string, string, string) {
+	var namespace, cpuLimit, memoryLimit string
+
+	//Check passed namespace
+	ns := params.Namespace
+	if ns == nil {
+		namespace = ""
+	} else {
+		namespace = *params.Namespace
+	}
+
+	//Check passed cpu threshold value
+	cpuThreshold := params.CPUThreshold
+	if cpuThreshold == nil {
+		cpuLimit = ""
+	} else {
+		cpuLimit = *cpuThreshold
+	}
+
+	//Check passed memory threshold value
+	memoryThreshold := params.MemoryThreshold
+	if memoryThreshold == nil {
+		memoryLimit = ""
+	} else {
+		memoryLimit = *memoryThreshold
+	}
+	return namespace, cpuLimit, memoryLimit
 }
 
 // The TLS configuration before HTTPS server starts.

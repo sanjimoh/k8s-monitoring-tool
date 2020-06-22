@@ -13,7 +13,9 @@ import (
 
 // GetV1PodsURL generates an URL for the get v1 pods operation
 type GetV1PodsURL struct {
-	Namespace *string
+	CPUThreshold    *string
+	MemoryThreshold *string
+	Namespace       *string
 
 	_basePath string
 	// avoid unkeyed usage
@@ -48,6 +50,22 @@ func (o *GetV1PodsURL) Build() (*url.URL, error) {
 	_result.Path = golangswaggerpaths.Join(_basePath, _path)
 
 	qs := make(url.Values)
+
+	var cPUThresholdQ string
+	if o.CPUThreshold != nil {
+		cPUThresholdQ = *o.CPUThreshold
+	}
+	if cPUThresholdQ != "" {
+		qs.Set("cpuThreshold", cPUThresholdQ)
+	}
+
+	var memoryThresholdQ string
+	if o.MemoryThreshold != nil {
+		memoryThresholdQ = *o.MemoryThreshold
+	}
+	if memoryThresholdQ != "" {
+		qs.Set("memoryThreshold", memoryThresholdQ)
+	}
 
 	var namespaceQ string
 	if o.Namespace != nil {

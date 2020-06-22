@@ -17,9 +17,17 @@ import (
 // swagger:model Pod
 type Pod struct {
 
+	// Pod containers
+	// Required: true
+	Containers PodContainers `json:"containers"`
+
 	// Pod name
 	// Required: true
 	Name *string `json:"name"`
+
+	// Namespace in which Pod exists
+	// Required: true
+	Namespace *string `json:"namespace"`
 
 	// Pod status
 	// Required: true
@@ -30,7 +38,15 @@ type Pod struct {
 func (m *Pod) Validate(formats strfmt.Registry) error {
 	var res []error
 
+	if err := m.validateContainers(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateName(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateNamespace(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -44,9 +60,34 @@ func (m *Pod) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
+func (m *Pod) validateContainers(formats strfmt.Registry) error {
+
+	if err := validate.Required("containers", "body", m.Containers); err != nil {
+		return err
+	}
+
+	if err := m.Containers.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("containers")
+		}
+		return err
+	}
+
+	return nil
+}
+
 func (m *Pod) validateName(formats strfmt.Registry) error {
 
 	if err := validate.Required("name", "body", m.Name); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *Pod) validateNamespace(formats strfmt.Registry) error {
+
+	if err := validate.Required("namespace", "body", m.Namespace); err != nil {
 		return err
 	}
 
