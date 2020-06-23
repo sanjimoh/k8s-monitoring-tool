@@ -76,7 +76,7 @@ func init() {
     },
     "/v1/pods": {
       "get": {
-        "description": "For example:\n` + "`" + `` + "`" + `` + "`" + `\nGET /api/kmt/v1/pods\nGET /api/kmt/v1/pods?namespace=databricks\nGET /api/kmt/v1/pods?namespace=databricks\u0026cpuThreshold=3\u0026memoryThreshold=1073741824\n` + "`" + `` + "`" + `` + "`" + `\n\nReturns list of pods with their status:\n` + "`" + `` + "`" + `` + "`" + `\n[\n  {\n    \"name\": \"pod-1\",\n    \"status\": {\n      \"phase\": \"Running\",\n      \"description\": \"Pod is running\",\n      \"podIp\": \"192.1.1.1\",\n      \"hostIp\": \"string\"\n    }\n  },\n  {\n    \"name\": \"pod-2\",\n    \"status\": {\n      \"phase\": \"Pending\",\n      \"description\": \"Pending due to lack of resources\",\n      \"podIp\": \"\",\n      \"hostIp\": \"\"\n    }\n  },\n  ...\n]\n` + "`" + `` + "`" + `` + "`" + `\n",
+        "description": "For example:\n` + "`" + `` + "`" + `` + "`" + `\nGET /api/kmt/v1/pods\nGET /api/kmt/v1/pods?namespace=databricks\nGET /api/kmt/v1/pods?namespace=databricks\u0026cpuThreshold=3\u0026memoryThreshold=1073741824\n` + "`" + `` + "`" + `` + "`" + `\n\nReturns list of pods with their status:\n` + "`" + `` + "`" + `` + "`" + `\n[\n  {\n    \"name\": \"pod-1\",\n    \"status\": {\n      \"phase\": \"Running\",\n      \"description\": \"Pod is running\",\n      \"podIp\": \"192.1.1.1\",\n      \"hostIp\": \"string\"\n    },\n    \"containers\": [\n       {\n         \"name\": \"container-0\",\n         \"currentCpuUsage\": \"\",\n         \"currentMemoryUsage\": \"\"\n       }\n     ]\n  },\n  {\n    \"name\": \"pod-2\",\n    \"status\": {\n      \"phase\": \"Pending\",\n      \"description\": \"Pending due to lack of resources\",\n      \"podIp\": \"\",\n      \"hostIp\": \"\"\n    },\n   \"containers\": [\n      {\n        \"name\": \"container-1\",\n        \"currentCpuUsage\": \"\",\n        \"currentMemoryUsage\": \"\"\n      }\n    ]\n  },\n  ...\n]\n` + "`" + `` + "`" + `` + "`" + `\n",
         "consumes": [
           "application/json"
         ],
@@ -203,12 +203,15 @@ func init() {
     "PodDeployment": {
       "description": "A pod deployment to update",
       "type": "object",
-      "required": [
-        "name",
-        "replicas",
-        "image"
-      ],
       "properties": {
+        "affinityKey": {
+          "description": "Label key used for pods scheduling anti-affinity rule.",
+          "type": "string"
+        },
+        "affinityValues": {
+          "description": "Comma separated label selector key values for pods scheduling anti-affinity rule.",
+          "type": "string"
+        },
         "image": {
           "description": "Provide the new image name, version.",
           "type": "string"
@@ -319,7 +322,7 @@ func init() {
     },
     "/v1/pods": {
       "get": {
-        "description": "For example:\n` + "`" + `` + "`" + `` + "`" + `\nGET /api/kmt/v1/pods\nGET /api/kmt/v1/pods?namespace=databricks\nGET /api/kmt/v1/pods?namespace=databricks\u0026cpuThreshold=3\u0026memoryThreshold=1073741824\n` + "`" + `` + "`" + `` + "`" + `\n\nReturns list of pods with their status:\n` + "`" + `` + "`" + `` + "`" + `\n[\n  {\n    \"name\": \"pod-1\",\n    \"status\": {\n      \"phase\": \"Running\",\n      \"description\": \"Pod is running\",\n      \"podIp\": \"192.1.1.1\",\n      \"hostIp\": \"string\"\n    }\n  },\n  {\n    \"name\": \"pod-2\",\n    \"status\": {\n      \"phase\": \"Pending\",\n      \"description\": \"Pending due to lack of resources\",\n      \"podIp\": \"\",\n      \"hostIp\": \"\"\n    }\n  },\n  ...\n]\n` + "`" + `` + "`" + `` + "`" + `\n",
+        "description": "For example:\n` + "`" + `` + "`" + `` + "`" + `\nGET /api/kmt/v1/pods\nGET /api/kmt/v1/pods?namespace=databricks\nGET /api/kmt/v1/pods?namespace=databricks\u0026cpuThreshold=3\u0026memoryThreshold=1073741824\n` + "`" + `` + "`" + `` + "`" + `\n\nReturns list of pods with their status:\n` + "`" + `` + "`" + `` + "`" + `\n[\n  {\n    \"name\": \"pod-1\",\n    \"status\": {\n      \"phase\": \"Running\",\n      \"description\": \"Pod is running\",\n      \"podIp\": \"192.1.1.1\",\n      \"hostIp\": \"string\"\n    },\n    \"containers\": [\n       {\n         \"name\": \"container-0\",\n         \"currentCpuUsage\": \"\",\n         \"currentMemoryUsage\": \"\"\n       }\n     ]\n  },\n  {\n    \"name\": \"pod-2\",\n    \"status\": {\n      \"phase\": \"Pending\",\n      \"description\": \"Pending due to lack of resources\",\n      \"podIp\": \"\",\n      \"hostIp\": \"\"\n    },\n   \"containers\": [\n      {\n        \"name\": \"container-1\",\n        \"currentCpuUsage\": \"\",\n        \"currentMemoryUsage\": \"\"\n      }\n    ]\n  },\n  ...\n]\n` + "`" + `` + "`" + `` + "`" + `\n",
         "consumes": [
           "application/json"
         ],
@@ -446,12 +449,15 @@ func init() {
     "PodDeployment": {
       "description": "A pod deployment to update",
       "type": "object",
-      "required": [
-        "name",
-        "replicas",
-        "image"
-      ],
       "properties": {
+        "affinityKey": {
+          "description": "Label key used for pods scheduling anti-affinity rule.",
+          "type": "string"
+        },
+        "affinityValues": {
+          "description": "Comma separated label selector key values for pods scheduling anti-affinity rule.",
+          "type": "string"
+        },
         "image": {
           "description": "Provide the new image name, version.",
           "type": "string"

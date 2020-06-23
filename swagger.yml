@@ -204,10 +204,6 @@ definitions:
   PodDeployment:
     type: object
     description: A pod deployment to update
-    required:
-      - name
-      - replicas
-      - image
     properties:
       name:
         type: string
@@ -218,6 +214,12 @@ definitions:
       image:
         type: string
         description: Provide the new image name, version.
+      affinityKey:
+        type: string
+        description: Label key used for pods scheduling anti-affinity rule.
+      affinityValues:
+        type: string
+        description: Comma separated label selector key values for pods scheduling anti-affinity rule.
   Pods:
     type: array
     description: Array of pod items

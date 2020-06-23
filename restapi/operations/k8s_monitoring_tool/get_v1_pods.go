@@ -50,7 +50,14 @@ Returns list of pods with their status:
       "description": "Pod is running",
       "podIp": "192.1.1.1",
       "hostIp": "string"
-    }
+    },
+    "containers": [
+       {
+         "name": "container-0",
+         "currentCpuUsage": "",
+         "currentMemoryUsage": ""
+       }
+     ]
   },
   {
     "name": "pod-2",
@@ -59,7 +66,14 @@ Returns list of pods with their status:
       "description": "Pending due to lack of resources",
       "podIp": "",
       "hostIp": ""
-    }
+    },
+   "containers": [
+      {
+        "name": "container-1",
+        "currentCpuUsage": "",
+        "currentMemoryUsage": ""
+      }
+    ]
   },
   ...
 ]

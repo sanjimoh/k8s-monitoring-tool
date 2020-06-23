@@ -6,10 +6,8 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
-	"github.com/go-openapi/validate"
 )
 
 // PodDeployment A pod deployment to update
@@ -17,65 +15,24 @@ import (
 // swagger:model PodDeployment
 type PodDeployment struct {
 
+	// Label key used for pods scheduling anti-affinity rule.
+	AffinityKey string `json:"affinityKey,omitempty"`
+
+	// Comma separated label selector key values for pods scheduling anti-affinity rule.
+	AffinityValues string `json:"affinityValues,omitempty"`
+
 	// Provide the new image name, version.
-	// Required: true
-	Image *string `json:"image"`
+	Image string `json:"image,omitempty"`
 
 	// Provide the name of the pod deployment.
-	// Required: true
-	Name *string `json:"name"`
+	Name string `json:"name,omitempty"`
 
 	// Provide the number of replicas to modify.
-	// Required: true
-	Replicas *string `json:"replicas"`
+	Replicas string `json:"replicas,omitempty"`
 }
 
 // Validate validates this pod deployment
 func (m *PodDeployment) Validate(formats strfmt.Registry) error {
-	var res []error
-
-	if err := m.validateImage(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateName(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateReplicas(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if len(res) > 0 {
-		return errors.CompositeValidationError(res...)
-	}
-	return nil
-}
-
-func (m *PodDeployment) validateImage(formats strfmt.Registry) error {
-
-	if err := validate.Required("image", "body", m.Image); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (m *PodDeployment) validateName(formats strfmt.Registry) error {
-
-	if err := validate.Required("name", "body", m.Name); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (m *PodDeployment) validateReplicas(formats strfmt.Registry) error {
-
-	if err := validate.Required("replicas", "body", m.Replicas); err != nil {
-		return err
-	}
-
 	return nil
 }
 

@@ -9,6 +9,9 @@ The existing codebase - (more to come..)
   deployment number of replicas and pod deployment container image name & version. Other update will be soon introduced.
 * Now it is also possible to fetch a list of pods and it's containers which is breaching a passed CPU & memory 
   thresholds.
+* Now it is also possible to update pod deployment with pod anti-affinity rules which would ensure pods are running in 
+  different Kubernetes nodes. This is implemented based on Kubernetes label selectors. The pod anti-affinity rule 
+  currently supported is "preferredDuringSchedulingIgnoredDuringExecution"
 
 ## Exposed rest endpoints and payload details
 Existing codebase exposes the following endpoints -
@@ -63,6 +66,8 @@ In both the above scenario, the returned response would look like something belo
 * PUT /api/kmt/v1/pod
   This endpoint will update a given pod deployment in a kubernetes cluster. Current support is limited to updation of 
   number of pod replicas and image name & version.
+  Use "affinityKey" & "affinityValues" if you intend to ensure pod anti-affinity rules. In this case the pods matching
+  to "affinityKey" & "affinityValues" would be scheduled in different Kubernetes nodes.
   ```
     PUT /api/kmt/v1/pod
    ```
@@ -73,7 +78,9 @@ In both the above scenario, the returned response would look like something belo
     {
       "name": "apache-cassandra",
       "replicas": "5",
-      "image": "ccas-apache:2.5"
+      "image": "ccas-apache:2.5",
+      "affinityKey": "app",
+      "affinityValues": "ccas-apache,mariadb"
     }
   ```
 

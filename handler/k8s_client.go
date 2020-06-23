@@ -12,6 +12,7 @@ import (
 	metrics "k8s.io/metrics/pkg/client/clientset/versioned"
 	"log"
 	"strconv"
+	"strings"
 )
 
 const (
@@ -91,11 +92,13 @@ func (kc *K8sClient) GetAllPods(namespace string) (models.Pods, error) {
 }
 
 func (kc *K8sClient) UpdatePodDeployment(deployment *models.PodDeployment) (*models.PodDeployment, error) {
-	deploymentName := *deployment.Name
-	replicas := *deployment.Replicas
-	imageNameVer := *deployment.Image
+	deploymentName := deployment.Name
+	replicas := deployment.Replicas
+	imageNameVer := deployment.Image
+	labelKey := deployment.AffinityKey
+	labelValues := deployment.AffinityValues
 
-	if (len(deploymentName) > 0) && (len(replicas) > 0 || len(imageNameVer) > 0) {
+	if len(deploymentName) > 0 {
 		deploymentsClient := kc.clientSet.AppsV1().Deployments(apiv1.NamespaceAll)
 
 		retryErr := retry.RetryOnConflict(retry.DefaultRetry, func() error {
@@ -104,16 +107,36 @@ func (kc *K8sClient) UpdatePodDeployment(deployment *models.PodDeployment) (*mod
 				return fmt.Errorf("Failed to get latest version of Deployment: %v", getErr)
 			}
 
-			replicasInt64, err := strconv.ParseInt(replicas, 10, 32)
-			if err != nil {
-				return fmt.Errorf("Failed to convert replicas string to int64: %v", err)
-			}
-
+			// Handling update of number of replicas
 			if len(replicas) > 0 {
+				replicasInt64, err := strconv.ParseInt(replicas, 10, 32)
+				if err != nil {
+					return fmt.Errorf("Failed to convert replicas string to int64: %v", err)
+				}
+
 				result.Spec.Replicas = int32Ptr(int32(replicasInt64))
 			}
+
+			// Handling update of image name & version
 			if len(imageNameVer) > 0 {
 				result.Spec.Template.Spec.Containers[0].Image = imageNameVer
+			}
+
+			// Handling Pod anti-affinity
+			if len(labelKey) > 0 && len(labelValues) > 0 {
+				affinityTerms := make([]apiv1.WeightedPodAffinityTerm, 1)
+				for _, term := range affinityTerms {
+					term.Weight = 50
+					labelRequirements := make([]metav1.LabelSelectorRequirement, 1)
+					for _, label := range labelRequirements {
+						label.Key = labelKey
+						label.Operator = metav1.LabelSelectorOpIn
+						label.Values = strings.Split(labelValues, ",")
+					}
+					term.PodAffinityTerm.TopologyKey = "kubernetes.io/hostname"
+					term.PodAffinityTerm.LabelSelector.MatchExpressions = labelRequirements
+				}
+				result.Spec.Template.Spec.Affinity.PodAntiAffinity.PreferredDuringSchedulingIgnoredDuringExecution = affinityTerms
 			}
 
 			_, updateErr := deploymentsClient.Update(context.TODO(), result, metav1.UpdateOptions{})
