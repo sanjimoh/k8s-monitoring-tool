@@ -91,30 +91,40 @@ func (kc *K8sClient) GetAllPods(namespace string) (models.Pods, error) {
 }
 
 func (kc *K8sClient) UpdatePodDeployment(deployment *models.PodDeployment) (*models.PodDeployment, error) {
-	deploymentsClient := kc.clientSet.AppsV1().Deployments(apiv1.NamespaceAll)
+	deploymentName := *deployment.Name
+	replicas := *deployment.Replicas
+	imageNameVer := *deployment.Image
 
-	retryErr := retry.RetryOnConflict(retry.DefaultRetry, func() error {
-		result, getErr := deploymentsClient.Get(context.TODO(), *deployment.Name, metav1.GetOptions{})
-		if getErr != nil {
-			return fmt.Errorf("Failed to get latest version of Deployment: %v", getErr)
+	if (len(deploymentName) > 0) && (len(replicas) > 0 || len(imageNameVer) > 0) {
+		deploymentsClient := kc.clientSet.AppsV1().Deployments(apiv1.NamespaceAll)
+
+		retryErr := retry.RetryOnConflict(retry.DefaultRetry, func() error {
+			result, getErr := deploymentsClient.Get(context.TODO(), deploymentName, metav1.GetOptions{})
+			if getErr != nil {
+				return fmt.Errorf("Failed to get latest version of Deployment: %v", getErr)
+			}
+
+			replicasInt64, err := strconv.ParseInt(replicas, 10, 32)
+			if err != nil {
+				return fmt.Errorf("Failed to convert replicas string to int64: %v", err)
+			}
+
+			if len(replicas) > 0 {
+				result.Spec.Replicas = int32Ptr(int32(replicasInt64))
+			}
+			if len(imageNameVer) > 0 {
+				result.Spec.Template.Spec.Containers[0].Image = imageNameVer
+			}
+
+			_, updateErr := deploymentsClient.Update(context.TODO(), result, metav1.UpdateOptions{})
+			return updateErr
+		})
+		if retryErr != nil {
+			return nil, fmt.Errorf("Update failed: %v", retryErr)
 		}
 
-		replicasInt64, err := strconv.ParseInt(*deployment.Replicas, 10, 32)
-		if err != nil {
-			return fmt.Errorf("Failed to convert replicas string to int64: %v", err)
-		}
-
-		result.Spec.Replicas = int32Ptr(int32(replicasInt64))
-		result.Spec.Template.Spec.Containers[0].Image = *deployment.Image
-
-		_, updateErr := deploymentsClient.Update(context.TODO(), result, metav1.UpdateOptions{})
-		return updateErr
-	})
-	if retryErr != nil {
-		return nil, fmt.Errorf("Update failed: %v", retryErr)
+		log.Println("Updated deployment...")
 	}
-
-	log.Println("Updated deployment...")
 
 	return deployment, nil
 }
