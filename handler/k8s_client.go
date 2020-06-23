@@ -50,6 +50,7 @@ func NewK8sClient() (*K8sClient, error) {
 func (kc *K8sClient) GetAllPods(namespace string) (models.Pods, error) {
 	var pods models.Pods
 	var containers models.PodContainers
+	var labels []string
 
 	podList, err := kc.clientSet.CoreV1().Pods(namespace).List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
@@ -78,11 +79,16 @@ func (kc *K8sClient) GetAllPods(namespace string) (models.Pods, error) {
 			PodIP:       makeStringPtr(podInCluster.Status.PodIP),
 		}
 
+		for key, value := range podInCluster.Labels {
+			labels = append(labels, key+":"+value)
+		}
+
 		pod := &models.Pod{
 			Name:       makeStringPtr(podInCluster.Name),
 			Namespace:  makeStringPtr(podInCluster.Namespace),
 			Status:     podStatus,
 			Containers: containers,
+			Labels:     strings.Join(labels, ", "),
 		}
 
 		pods = append(pods, pod)

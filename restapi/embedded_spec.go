@@ -155,6 +155,10 @@ func init() {
           "type": "object",
           "$ref": "#/definitions/PodContainers"
         },
+        "labels": {
+          "description": "A string of labels associated with the pod in the format key1:value1,key2:value2,...",
+          "type": "string"
+        },
         "name": {
           "description": "Pod name",
           "type": "string"
@@ -400,6 +404,10 @@ func init() {
           "description": "Pod containers",
           "type": "object",
           "$ref": "#/definitions/PodContainers"
+        },
+        "labels": {
+          "description": "A string of labels associated with the pod in the format key1:value1,key2:value2,...",
+          "type": "string"
         },
         "name": {
           "description": "Pod name",

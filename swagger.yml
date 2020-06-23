@@ -47,6 +47,8 @@ paths:
         [
           {
             "name": "pod-1",
+            "namespace": "databricks",
+            "labels": "app:pod-1",
             "status": {
               "phase": "Running",
               "description": "Pod is running",
@@ -63,6 +65,8 @@ paths:
           },
           {
             "name": "pod-2",
+            "namespace": "databricks",
+            "labels": "app:pod-2",
             "status": {
               "phase": "Pending",
               "description": "Pending due to lack of resources",
@@ -147,6 +151,9 @@ definitions:
       name:
         type: string
         description: Pod name
+      labels:
+        type: string
+        description: A string of labels associated with the pod in the format key1:value1,key2:value2,...
       namespace:
         type: string
         description: Namespace in which Pod exists

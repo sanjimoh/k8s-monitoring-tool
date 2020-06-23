@@ -30,6 +30,8 @@ In both the above scenario, the returned response would look like something belo
     [
       {
         "name": "pod-1",
+        "namespace": "databricks",
+        "labels": "app:pod-1",
         "status": {
           "phase": "Running",
           "description": "Pod is running",
@@ -46,6 +48,8 @@ In both the above scenario, the returned response would look like something belo
       },
       {
         "name": "pod-2",
+        "namespace": "databricks",
+        "labels": "app:pod-2",
         "status": {
           "phase": "Pending",
           "description": "Pending due to lack of resources",

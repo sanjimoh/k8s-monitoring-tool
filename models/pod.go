@@ -21,6 +21,9 @@ type Pod struct {
 	// Required: true
 	Containers PodContainers `json:"containers"`
 
+	// A string of labels associated with the pod in the format key1:value1,key2:value2,...
+	Labels string `json:"labels,omitempty"`
+
 	// Pod name
 	// Required: true
 	Name *string `json:"name"`
