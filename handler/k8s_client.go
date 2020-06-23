@@ -161,6 +161,7 @@ func (kc *K8sClient) UpdatePodDeployment(deployment *models.PodDeployment) (*mod
 func (kc *K8sClient) GetAllPodsUnderLoad(namespace string, cpuThreshold string, memoryThreshold string) (models.Pods, error) {
 	var pods models.Pods
 	var containers models.PodContainers
+	var labels []string
 
 	cpuThresholdInInt64, err := strconv.ParseInt(cpuThreshold, 10, 32)
 	if err != nil {
@@ -194,11 +195,16 @@ func (kc *K8sClient) GetAllPodsUnderLoad(namespace string, cpuThreshold string, 
 				}
 				containers = append(containers, podContainer)
 
+				for key, value := range podMetric.Labels {
+					labels = append(labels, key+":"+value)
+				}
+
 				pod := &models.Pod{
 					Name:       makeStringPtr(podMetric.Name),
 					Namespace:  makeStringPtr(podMetric.Namespace),
 					Status:     podStatus,
 					Containers: containers,
+					Labels:     strings.Join(labels, ", "),
 				}
 
 				pods = append(pods, pod)
