@@ -84,7 +84,7 @@ In both the above scenario, the returned response would look like something belo
       "replicas": "5",
       "image": "ccas-apache:2.5",
       "affinityKey": "app",
-      "affinityValues": "ccas-apache,mariadb"
+      "affinityValues": "pod-1,pod-2"
     }
   ```
 
