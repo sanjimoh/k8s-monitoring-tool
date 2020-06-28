@@ -87,6 +87,21 @@ In both the above scenario, the returned response would look like something belo
       "affinityValues": "pod-1,pod-2"
     }
   ```
+## How to run
+Update Makefile's "run" target and provide the following inputs -
+```
+* KUBE_CONFIG
+```
+
+After you provided the above details, then you are good to run the application by simply executing -
+```
+make run
+```
+
+Now, you can make calls to the API exposed by this application - (for example)
+```
+curl -X GET "http://127.0.0.1:30001/api/kmt/v1/pods?namespace=kube-system"
+```
 
 ## Technology Selection
 * [Golang](https://golang.org/) used for implementation.
