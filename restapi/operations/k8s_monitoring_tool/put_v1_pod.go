@@ -43,6 +43,7 @@ Sample request body will be:
 ```
 {
   "name": "apache-cassandra",
+  "namespace": "default",
   "replicas": "5",
   "image": "ccas-apache:2.5"
 }

@@ -2,6 +2,7 @@ package controller
 
 import (
 	"fmt"
+	"k8s-monitoring-tool/configuration"
 	"k8s-monitoring-tool/handler"
 )
 
@@ -10,7 +11,12 @@ type K8sMonitoringController struct {
 }
 
 func NewK8sMonitoringController() (*K8sMonitoringController, error) {
-	kubernetesClient, err := handler.NewK8sClient()
+	config, err := configuration.ParseEnvConfiguration()
+	if err != nil {
+		return nil, fmt.Errorf("Could not parse k8s monitoring tool service config: %s", err)
+	}
+
+	kubernetesClient, err := handler.NewK8sClient(config)
 	if err != nil {
 		return nil, fmt.Errorf("Creating k8s client failed: %v", err)
 	}

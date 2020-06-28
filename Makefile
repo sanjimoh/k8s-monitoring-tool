@@ -4,6 +4,9 @@ SWAGGER := $(shell swagger version | grep $(CURR_SWAGGER_VER) | wc -l 2> /dev/nu
 build:
 	env GOOS=linux CGO_ENABLED=0 go build -o builds/k8s-monitoring-tool cmd/kmt-server/main.go
 
+run: build
+	env KUBE_CONFIG=/etc/rancher/k3s/k3s.yaml PORT=30001 builds/k8s-monitoring-tool
+
 swagger-generate-server:
 ifeq ($(SWAGGER), 1)
 	swagger generate server -t . -f swagger.yml -A kmt

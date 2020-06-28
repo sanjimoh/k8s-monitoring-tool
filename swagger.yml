@@ -120,6 +120,7 @@ paths:
         ```
         {
           "name": "apache-cassandra",
+          "namespace": "default",
           "replicas": "5",
           "image": "ccas-apache:2.5"
         }
@@ -215,6 +216,9 @@ definitions:
       name:
         type: string
         description: Provide the name of the pod deployment.
+      namespace:
+        type: string
+        description: Provide the namespace of the pod deployment.
       replicas:
         type: string
         description: Provide the number of replicas to modify.

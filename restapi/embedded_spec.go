@@ -31,7 +31,7 @@ func init() {
   "paths": {
     "/v1/pod": {
       "put": {
-        "description": "For example:\n` + "`" + `` + "`" + `` + "`" + `\nPUT /api/kmt/v1/pod\n` + "`" + `` + "`" + `` + "`" + `\n\nSample request body will be:\n\n` + "`" + `` + "`" + `` + "`" + `\n{\n  \"name\": \"apache-cassandra\",\n  \"replicas\": \"5\",\n  \"image\": \"ccas-apache:2.5\"\n}\n` + "`" + `` + "`" + `` + "`" + `\n",
+        "description": "For example:\n` + "`" + `` + "`" + `` + "`" + `\nPUT /api/kmt/v1/pod\n` + "`" + `` + "`" + `` + "`" + `\n\nSample request body will be:\n\n` + "`" + `` + "`" + `` + "`" + `\n{\n  \"name\": \"apache-cassandra\",\n  \"namespace\": \"default\",\n  \"replicas\": \"5\",\n  \"image\": \"ccas-apache:2.5\"\n}\n` + "`" + `` + "`" + `` + "`" + `\n",
         "consumes": [
           "application/json"
         ],
@@ -76,7 +76,7 @@ func init() {
     },
     "/v1/pods": {
       "get": {
-        "description": "For example:\n` + "`" + `` + "`" + `` + "`" + `\nGET /api/kmt/v1/pods\nGET /api/kmt/v1/pods?namespace=databricks\nGET /api/kmt/v1/pods?namespace=databricks\u0026cpuThreshold=3\u0026memoryThreshold=1073741824\n` + "`" + `` + "`" + `` + "`" + `\n\nReturns list of pods with their status:\n` + "`" + `` + "`" + `` + "`" + `\n[\n  {\n    \"name\": \"pod-1\",\n    \"status\": {\n      \"phase\": \"Running\",\n      \"description\": \"Pod is running\",\n      \"podIp\": \"192.1.1.1\",\n      \"hostIp\": \"string\"\n    },\n    \"containers\": [\n       {\n         \"name\": \"container-0\",\n         \"currentCpuUsage\": \"\",\n         \"currentMemoryUsage\": \"\"\n       }\n     ]\n  },\n  {\n    \"name\": \"pod-2\",\n    \"status\": {\n      \"phase\": \"Pending\",\n      \"description\": \"Pending due to lack of resources\",\n      \"podIp\": \"\",\n      \"hostIp\": \"\"\n    },\n   \"containers\": [\n      {\n        \"name\": \"container-1\",\n        \"currentCpuUsage\": \"\",\n        \"currentMemoryUsage\": \"\"\n      }\n    ]\n  },\n  ...\n]\n` + "`" + `` + "`" + `` + "`" + `\n",
+        "description": "For example:\n` + "`" + `` + "`" + `` + "`" + `\nGET /api/kmt/v1/pods\nGET /api/kmt/v1/pods?namespace=databricks\nGET /api/kmt/v1/pods?namespace=databricks\u0026cpuThreshold=3\u0026memoryThreshold=1073741824\n` + "`" + `` + "`" + `` + "`" + `\n\nReturns list of pods with their status:\n` + "`" + `` + "`" + `` + "`" + `\n[\n  {\n    \"name\": \"pod-1\",\n    \"namespace\": \"databricks\",\n    \"labels\": \"app:pod-1\",\n    \"status\": {\n      \"phase\": \"Running\",\n      \"description\": \"Pod is running\",\n      \"podIp\": \"192.1.1.1\",\n      \"hostIp\": \"string\"\n    },\n    \"containers\": [\n       {\n         \"name\": \"container-0\",\n         \"currentCpuUsage\": \"\",\n         \"currentMemoryUsage\": \"\"\n       }\n     ]\n  },\n  {\n    \"name\": \"pod-2\",\n    \"namespace\": \"databricks\",\n    \"labels\": \"app:pod-2\",\n    \"status\": {\n      \"phase\": \"Pending\",\n      \"description\": \"Pending due to lack of resources\",\n      \"podIp\": \"\",\n      \"hostIp\": \"\"\n    },\n   \"containers\": [\n      {\n        \"name\": \"container-1\",\n        \"currentCpuUsage\": \"\",\n        \"currentMemoryUsage\": \"\"\n      }\n    ]\n  },\n  ...\n]\n` + "`" + `` + "`" + `` + "`" + `\n",
         "consumes": [
           "application/json"
         ],
@@ -222,6 +222,10 @@ func init() {
         },
         "name": {
           "description": "Provide the name of the pod deployment.",
+          "type": "string"
+        },
+        "namespace": {
+          "description": "Provide the namespace of the pod deployment.",
           "type": "string"
         },
         "replicas": {
@@ -281,7 +285,7 @@ func init() {
   "paths": {
     "/v1/pod": {
       "put": {
-        "description": "For example:\n` + "`" + `` + "`" + `` + "`" + `\nPUT /api/kmt/v1/pod\n` + "`" + `` + "`" + `` + "`" + `\n\nSample request body will be:\n\n` + "`" + `` + "`" + `` + "`" + `\n{\n  \"name\": \"apache-cassandra\",\n  \"replicas\": \"5\",\n  \"image\": \"ccas-apache:2.5\"\n}\n` + "`" + `` + "`" + `` + "`" + `\n",
+        "description": "For example:\n` + "`" + `` + "`" + `` + "`" + `\nPUT /api/kmt/v1/pod\n` + "`" + `` + "`" + `` + "`" + `\n\nSample request body will be:\n\n` + "`" + `` + "`" + `` + "`" + `\n{\n  \"name\": \"apache-cassandra\",\n  \"namespace\": \"default\",\n  \"replicas\": \"5\",\n  \"image\": \"ccas-apache:2.5\"\n}\n` + "`" + `` + "`" + `` + "`" + `\n",
         "consumes": [
           "application/json"
         ],
@@ -326,7 +330,7 @@ func init() {
     },
     "/v1/pods": {
       "get": {
-        "description": "For example:\n` + "`" + `` + "`" + `` + "`" + `\nGET /api/kmt/v1/pods\nGET /api/kmt/v1/pods?namespace=databricks\nGET /api/kmt/v1/pods?namespace=databricks\u0026cpuThreshold=3\u0026memoryThreshold=1073741824\n` + "`" + `` + "`" + `` + "`" + `\n\nReturns list of pods with their status:\n` + "`" + `` + "`" + `` + "`" + `\n[\n  {\n    \"name\": \"pod-1\",\n    \"status\": {\n      \"phase\": \"Running\",\n      \"description\": \"Pod is running\",\n      \"podIp\": \"192.1.1.1\",\n      \"hostIp\": \"string\"\n    },\n    \"containers\": [\n       {\n         \"name\": \"container-0\",\n         \"currentCpuUsage\": \"\",\n         \"currentMemoryUsage\": \"\"\n       }\n     ]\n  },\n  {\n    \"name\": \"pod-2\",\n    \"status\": {\n      \"phase\": \"Pending\",\n      \"description\": \"Pending due to lack of resources\",\n      \"podIp\": \"\",\n      \"hostIp\": \"\"\n    },\n   \"containers\": [\n      {\n        \"name\": \"container-1\",\n        \"currentCpuUsage\": \"\",\n        \"currentMemoryUsage\": \"\"\n      }\n    ]\n  },\n  ...\n]\n` + "`" + `` + "`" + `` + "`" + `\n",
+        "description": "For example:\n` + "`" + `` + "`" + `` + "`" + `\nGET /api/kmt/v1/pods\nGET /api/kmt/v1/pods?namespace=databricks\nGET /api/kmt/v1/pods?namespace=databricks\u0026cpuThreshold=3\u0026memoryThreshold=1073741824\n` + "`" + `` + "`" + `` + "`" + `\n\nReturns list of pods with their status:\n` + "`" + `` + "`" + `` + "`" + `\n[\n  {\n    \"name\": \"pod-1\",\n    \"namespace\": \"databricks\",\n    \"labels\": \"app:pod-1\",\n    \"status\": {\n      \"phase\": \"Running\",\n      \"description\": \"Pod is running\",\n      \"podIp\": \"192.1.1.1\",\n      \"hostIp\": \"string\"\n    },\n    \"containers\": [\n       {\n         \"name\": \"container-0\",\n         \"currentCpuUsage\": \"\",\n         \"currentMemoryUsage\": \"\"\n       }\n     ]\n  },\n  {\n    \"name\": \"pod-2\",\n    \"namespace\": \"databricks\",\n    \"labels\": \"app:pod-2\",\n    \"status\": {\n      \"phase\": \"Pending\",\n      \"description\": \"Pending due to lack of resources\",\n      \"podIp\": \"\",\n      \"hostIp\": \"\"\n    },\n   \"containers\": [\n      {\n        \"name\": \"container-1\",\n        \"currentCpuUsage\": \"\",\n        \"currentMemoryUsage\": \"\"\n      }\n    ]\n  },\n  ...\n]\n` + "`" + `` + "`" + `` + "`" + `\n",
         "consumes": [
           "application/json"
         ],
@@ -472,6 +476,10 @@ func init() {
         },
         "name": {
           "description": "Provide the name of the pod deployment.",
+          "type": "string"
+        },
+        "namespace": {
+          "description": "Provide the namespace of the pod deployment.",
           "type": "string"
         },
         "replicas": {

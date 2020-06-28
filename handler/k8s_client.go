@@ -3,11 +3,12 @@ package handler
 import (
 	"context"
 	"fmt"
+	"k8s-monitoring-tool/configuration"
 	"k8s-monitoring-tool/models"
 	apiv1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/util/retry"
 	metrics "k8s.io/metrics/pkg/client/clientset/versioned"
 	"log"
@@ -28,18 +29,18 @@ type K8sClient struct {
 	metricsClientSet *metrics.Clientset
 }
 
-func NewK8sClient() (*K8sClient, error) {
-	config, err := rest.InClusterConfig()
+func NewK8sClient(config *configuration.K8sEnvConfig) (*K8sClient, error) {
+	kubeconfig, err := clientcmd.BuildConfigFromFlags("", config.K8sConfig)
 	if err != nil {
-		return nil, fmt.Errorf("Could not fetch k8s cluster configuration: %s", err)
+		panic(err.Error())
 	}
 
-	cset, err := kubernetes.NewForConfig(config)
+	cset, err := kubernetes.NewForConfig(kubeconfig)
 	if err != nil {
 		return nil, fmt.Errorf("Could not set k8s cluster configuration: %s", err)
 	}
 
-	mc, err := metrics.NewForConfig(config)
+	mc, err := metrics.NewForConfig(kubeconfig)
 	if err != nil {
 		return nil, fmt.Errorf("Could not set k8s metrics cluster configuration: %s", err)
 	}
@@ -58,10 +59,6 @@ func (kc *K8sClient) GetAllPods(namespace string) (models.Pods, error) {
 	}
 
 	podsInCluster := podList.Items
-	if len(podsInCluster) > 0 {
-		pods = make(models.Pods, len(podsInCluster))
-	}
-
 	for _, podInCluster := range podsInCluster {
 		for _, container := range podInCluster.Spec.Containers {
 			podContainer := &models.PodContainer{
@@ -105,11 +102,12 @@ func (kc *K8sClient) UpdatePodDeployment(deployment *models.PodDeployment) (*mod
 	labelValues := deployment.AffinityValues
 
 	if len(deploymentName) > 0 {
-		deploymentsClient := kc.clientSet.AppsV1().Deployments(apiv1.NamespaceAll)
-
 		retryErr := retry.RetryOnConflict(retry.DefaultRetry, func() error {
+			deploymentsClient := kc.clientSet.AppsV1().Deployments(deployment.Namespace)
+
 			result, getErr := deploymentsClient.Get(context.TODO(), deploymentName, metav1.GetOptions{})
 			if getErr != nil {
+				log.Printf("Error while fetching deployment: %v", getErr)
 				return fmt.Errorf("Failed to get latest version of Deployment: %v", getErr)
 			}
 

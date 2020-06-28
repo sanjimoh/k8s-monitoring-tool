@@ -45,6 +45,8 @@ Returns list of pods with their status:
 [
   {
     "name": "pod-1",
+    "namespace": "databricks",
+    "labels": "app:pod-1",
     "status": {
       "phase": "Running",
       "description": "Pod is running",
@@ -61,6 +63,8 @@ Returns list of pods with their status:
   },
   {
     "name": "pod-2",
+    "namespace": "databricks",
+    "labels": "app:pod-2",
     "status": {
       "phase": "Pending",
       "description": "Pending due to lack of resources",

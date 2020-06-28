@@ -27,6 +27,9 @@ type PodDeployment struct {
 	// Provide the name of the pod deployment.
 	Name string `json:"name,omitempty"`
 
+	// Provide the namespace of the pod deployment.
+	Namespace string `json:"namespace,omitempty"`
+
 	// Provide the number of replicas to modify.
 	Replicas string `json:"replicas,omitempty"`
 }
