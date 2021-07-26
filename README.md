@@ -87,6 +87,11 @@ In both the above scenario, the returned response would look like something belo
       "affinityValues": "pod-1,pod-2"
     }
   ```
+* GET /api/kmt/v1alpha1/pods/log
+    This endpoint will fetch logs of a given pod container in a kubernetes cluster. 
+  ```
+    GET http://127.0.0.1:30001/api/kmt/v1alpha1/pods/log?namespace=<>&podName=<>&containerName=<>
+
 ## How to run
 Update Makefile's "run" target and provide the following inputs -
 ```
