@@ -15,13 +15,13 @@ The existing codebase - (more to come..)
 
 ## Exposed rest endpoints and payload details
 Existing codebase exposes the following endpoints -
-* GET /api/kmt/v1/pods
+* GET /api/kmt/v1alpha1/pods
   This endpoint will fetch all the pods & its status across all the k8s namespaces. 
   
-* GET /api/kmt/v1/pods?namespace=<provide_k8s_namespace_here>
+* GET /api/kmt/v1alpha1/pods?namespace=<provide_k8s_namespace_here>
   This endpoint will fetch all the pods for the given k8s namespaces
 
-* GET /api/kmt/v1/pods?namespace=<provide_k8s_namespace_here>&cpuThreshold=<cpu_threshold>&memoryThreshold=<memory_threshold>
+* GET /api/kmt/v1alpha1/pods?namespace=<provide_k8s_namespace_here>&cpuThreshold=<cpu_threshold>&memoryThreshold=<memory_threshold>
   This endpoint will fetch all the pods for the given k8s namespaces which breaches the given CPU & memory thresholds.
 
 In both the above scenario, the returned response would look like something below -
@@ -73,7 +73,7 @@ In both the above scenario, the returned response would look like something belo
   Use "affinityKey" & "affinityValues" if you intend to ensure pod anti-affinity rules. In this case the pods matching
   to "affinityKey" & "affinityValues" would be scheduled in different Kubernetes nodes.
   ```
-    PUT /api/kmt/v1/pod
+    PUT /api/kmt/v1alpha1/pod
    ```
 
     Sample request body will be:

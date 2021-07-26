@@ -44,43 +44,63 @@ func configureAPI(api *operations.KmtAPI) http.Handler {
 	}
 
 	// API handling for get all pod status & pods which are breaching cpu/memory thresholds
-	api.K8sMonitoringToolGetV1PodsHandler = k8s_monitoring_tool.GetV1PodsHandlerFunc(func(params k8s_monitoring_tool.GetV1PodsParams) middleware.Responder {
+	api.K8sMonitoringToolGetV1alpha1PodsHandler = k8s_monitoring_tool.GetV1alpha1PodsHandlerFunc(func(params k8s_monitoring_tool.GetV1alpha1PodsParams) middleware.Responder {
 		var pods models.Pods
 		var err error
 
 		namespace, cpuLimit, memoryLimit := validateAndSetParams(params)
 
 		if len(cpuLimit) == 0 && len(memoryLimit) == 0 {
-			pods, err = KMC.MonitoringHandler.GetV1Pods(namespace)
+			pods, err = KMC.MonitoringHandler.GetV1alpha1Pods(namespace)
 			if err != nil {
-				return k8s_monitoring_tool.NewGetV1PodsInternalServerError().WithPayload(&models.Error{
+				return k8s_monitoring_tool.NewGetV1alpha1PodsInternalServerError().WithPayload(&models.Error{
 					Code:    swag.Int64(500),
 					Message: swag.String(err.Error()),
 				})
 			}
 		} else {
-			pods, err = KMC.MonitoringHandler.GetV1PodsUnderLoad(namespace, cpuLimit, memoryLimit)
+			pods, err = KMC.MonitoringHandler.GetV1alpha1PodsUnderLoad(namespace, cpuLimit, memoryLimit)
 			if err != nil {
-				return k8s_monitoring_tool.NewGetV1PodsInternalServerError().WithPayload(&models.Error{
+				return k8s_monitoring_tool.NewGetV1alpha1PodsInternalServerError().WithPayload(&models.Error{
 					Code:    swag.Int64(500),
 					Message: swag.String(err.Error()),
 				})
 			}
 		}
 
-		return k8s_monitoring_tool.NewGetV1PodsOK().WithPayload(pods)
+		return k8s_monitoring_tool.NewGetV1alpha1PodsOK().WithPayload(pods)
 	})
 
-	api.K8sMonitoringToolPutV1PodHandler = k8s_monitoring_tool.PutV1PodHandlerFunc(func(params k8s_monitoring_tool.PutV1PodParams) middleware.Responder {
-		podDeployment, err := KMC.MonitoringHandler.PutV1Pod(params.PodDeployment)
+	// API handling for fetching pod logs
+	api.K8sMonitoringToolGetV1alpha1PodsLogHandler = k8s_monitoring_tool.GetV1alpha1PodsLogHandlerFunc(func(params k8s_monitoring_tool.GetV1alpha1PodsLogParams) middleware.Responder {
+		var podsLog string
+		var err error
+
+		namespace := params.Namespace
+		podName := params.PodName
+		containerName := params.ContainerName
+
+		podsLog, err = KMC.MonitoringHandler.GetV1alpha1PodsLog(namespace, podName, containerName)
 		if err != nil {
-			return k8s_monitoring_tool.NewPutV1PodInternalServerError().WithPayload(&models.Error{
+			return k8s_monitoring_tool.NewGetV1alpha1PodsLogInternalServerError().WithPayload(&models.Error{
 				Code:    swag.Int64(500),
 				Message: swag.String(err.Error()),
 			})
 		}
 
-		return k8s_monitoring_tool.NewPutV1PodOK().WithPayload(podDeployment)
+		return k8s_monitoring_tool.NewGetV1alpha1PodsLogOK().WithPayload(podsLog)
+	})
+
+	api.K8sMonitoringToolPutV1alpha1PodsHandler = k8s_monitoring_tool.PutV1alpha1PodsHandlerFunc(func(params k8s_monitoring_tool.PutV1alpha1PodsParams) middleware.Responder {
+		podDeployment, err := KMC.MonitoringHandler.PutV1alpha1Pod(params.PodDeployment)
+		if err != nil {
+			return k8s_monitoring_tool.NewPutV1alpha1PodsInternalServerError().WithPayload(&models.Error{
+				Code:    swag.Int64(500),
+				Message: swag.String(err.Error()),
+			})
+		}
+
+		return k8s_monitoring_tool.NewPutV1alpha1PodsOK().WithPayload(podDeployment)
 	})
 
 	api.PreServerShutdown = func() {}
@@ -90,7 +110,7 @@ func configureAPI(api *operations.KmtAPI) http.Handler {
 	return setupGlobalMiddleware(api.Serve(setupMiddlewares))
 }
 
-func validateAndSetParams(params k8s_monitoring_tool.GetV1PodsParams) (string, string, string) {
+func validateAndSetParams(params k8s_monitoring_tool.GetV1alpha1PodsParams) (string, string, string) {
 	var namespace, cpuLimit, memoryLimit string
 
 	//Check passed namespace

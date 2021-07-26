@@ -9,7 +9,7 @@ schemes:
   - http
 
 paths:
-  /v1/pods:
+  /v1alpha1/pods:
     get:
       summary: Gets all pods statistics running in the k8s cluster
       tags:
@@ -37,9 +37,9 @@ paths:
       description: |
         For example:
         ```
-        GET /api/kmt/v1/pods
-        GET /api/kmt/v1/pods?namespace=databricks
-        GET /api/kmt/v1/pods?namespace=databricks&cpuThreshold=3&memoryThreshold=1073741824
+        GET /api/kmt/v1alpha1/pods
+        GET /api/kmt/v1alpha1/pods?namespace=databricks
+        GET /api/kmt/v1alpha1/pods?namespace=databricks&cpuThreshold=3&memoryThreshold=1073741824
         ```
 
         Returns list of pods with their status:
@@ -94,7 +94,6 @@ paths:
           schema:
             $ref: "#/definitions/Error"
 
-  /v1/pod:
     put:
       summary: Update a pod configuration running in the k8s cluster
       tags:
@@ -138,6 +137,51 @@ paths:
           description: Internal server error.
           schema:
             $ref: '#/definitions/Error'
+
+  /v1alpha1/pods/log:
+    get:
+      summary: Gets logs of the given pod in the given namespace.
+      tags:
+        - k8s-monitoring-tool
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      parameters:
+        - in: query
+          name: namespace
+          type: string
+          required: true
+          description: Namespace wherein pod resides.
+        - in: query
+          name: podName
+          type: string
+          required: true
+          description: Name of the pod.
+        - in: query
+          name: containerName
+          type: string
+          required: true
+          description: Name of the container in the pod.
+      description: |
+        For example:
+        ```
+        GET /api/kmt/v1alpha1/pods/log?namespace=databricks&name=cassandra
+        ```
+
+        Returns list of pods with their status:
+        ```
+        ```
+      responses:
+        '200':
+          description: Fetching of all pod status is successful.
+          schema:
+            type: string
+#            $ref: "#/definitions/PodLogs"
+        '500':
+          description: Internal server error
+          schema:
+            $ref: "#/definitions/Error"
 
 definitions:
   Pod:
@@ -236,6 +280,16 @@ definitions:
     description: Array of pod items
     items:
       $ref: "#/definitions/Pod"
+  PodLogs:
+    type: object
+    description: pod logs
+    properties:
+      name:
+        type: string
+        description: name.
+      output:
+        type: string
+        description: output.
   Error:
     type: object
     required:

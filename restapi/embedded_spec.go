@@ -29,7 +29,54 @@ func init() {
   },
   "basePath": "/api/kmt",
   "paths": {
-    "/v1/pod": {
+    "/v1alpha1/pods": {
+      "get": {
+        "description": "For example:\n` + "`" + `` + "`" + `` + "`" + `\nGET /api/kmt/v1alpha1/pods\nGET /api/kmt/v1alpha1/pods?namespace=databricks\nGET /api/kmt/v1alpha1/pods?namespace=databricks\u0026cpuThreshold=3\u0026memoryThreshold=1073741824\n` + "`" + `` + "`" + `` + "`" + `\n\nReturns list of pods with their status:\n` + "`" + `` + "`" + `` + "`" + `\n[\n  {\n    \"name\": \"pod-1\",\n    \"namespace\": \"databricks\",\n    \"labels\": \"app:pod-1\",\n    \"status\": {\n      \"phase\": \"Running\",\n      \"description\": \"Pod is running\",\n      \"podIp\": \"192.1.1.1\",\n      \"hostIp\": \"string\"\n    },\n    \"containers\": [\n       {\n         \"name\": \"container-0\",\n         \"currentCpuUsage\": \"\",\n         \"currentMemoryUsage\": \"\"\n       }\n     ]\n  },\n  {\n    \"name\": \"pod-2\",\n    \"namespace\": \"databricks\",\n    \"labels\": \"app:pod-2\",\n    \"status\": {\n      \"phase\": \"Pending\",\n      \"description\": \"Pending due to lack of resources\",\n      \"podIp\": \"\",\n      \"hostIp\": \"\"\n    },\n   \"containers\": [\n      {\n        \"name\": \"container-1\",\n        \"currentCpuUsage\": \"\",\n        \"currentMemoryUsage\": \"\"\n      }\n    ]\n  },\n  ...\n]\n` + "`" + `` + "`" + `` + "`" + `\n",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "k8s-monitoring-tool"
+        ],
+        "summary": "Gets all pods statistics running in the k8s cluster",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Pass if pods status for a specific namespace is desired; otherwise all pods across all namespaces are returned.",
+            "name": "namespace",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Pass if you wish to fetch pods which are breaching the given cpuThreshold.",
+            "name": "cpuThreshold",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Pass byte value as string. Pass if you wish to fetch pods which are breaching the given memoryThreshold.",
+            "name": "memoryThreshold",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Fetching of all pod status is successful.",
+            "schema": {
+              "$ref": "#/definitions/Pods"
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
       "put": {
         "description": "For example:\n` + "`" + `` + "`" + `` + "`" + `\nPUT /api/kmt/v1/pod\n` + "`" + `` + "`" + `` + "`" + `\n\nSample request body will be:\n\n` + "`" + `` + "`" + `` + "`" + `\n{\n  \"name\": \"apache-cassandra\",\n  \"namespace\": \"default\",\n  \"replicas\": \"5\",\n  \"image\": \"ccas-apache:2.5\"\n}\n` + "`" + `` + "`" + `` + "`" + `\n",
         "consumes": [
@@ -74,9 +121,9 @@ func init() {
         }
       }
     },
-    "/v1/pods": {
+    "/v1alpha1/pods/log": {
       "get": {
-        "description": "For example:\n` + "`" + `` + "`" + `` + "`" + `\nGET /api/kmt/v1/pods\nGET /api/kmt/v1/pods?namespace=databricks\nGET /api/kmt/v1/pods?namespace=databricks\u0026cpuThreshold=3\u0026memoryThreshold=1073741824\n` + "`" + `` + "`" + `` + "`" + `\n\nReturns list of pods with their status:\n` + "`" + `` + "`" + `` + "`" + `\n[\n  {\n    \"name\": \"pod-1\",\n    \"namespace\": \"databricks\",\n    \"labels\": \"app:pod-1\",\n    \"status\": {\n      \"phase\": \"Running\",\n      \"description\": \"Pod is running\",\n      \"podIp\": \"192.1.1.1\",\n      \"hostIp\": \"string\"\n    },\n    \"containers\": [\n       {\n         \"name\": \"container-0\",\n         \"currentCpuUsage\": \"\",\n         \"currentMemoryUsage\": \"\"\n       }\n     ]\n  },\n  {\n    \"name\": \"pod-2\",\n    \"namespace\": \"databricks\",\n    \"labels\": \"app:pod-2\",\n    \"status\": {\n      \"phase\": \"Pending\",\n      \"description\": \"Pending due to lack of resources\",\n      \"podIp\": \"\",\n      \"hostIp\": \"\"\n    },\n   \"containers\": [\n      {\n        \"name\": \"container-1\",\n        \"currentCpuUsage\": \"\",\n        \"currentMemoryUsage\": \"\"\n      }\n    ]\n  },\n  ...\n]\n` + "`" + `` + "`" + `` + "`" + `\n",
+        "description": "For example:\n` + "`" + `` + "`" + `` + "`" + `\nGET /api/kmt/v1alpha1/pods/log?namespace=databricks\u0026name=cassandra\n` + "`" + `` + "`" + `` + "`" + `\n\nReturns list of pods with their status:\n` + "`" + `` + "`" + `` + "`" + `\n` + "`" + `` + "`" + `` + "`" + `\n",
         "consumes": [
           "application/json"
         ],
@@ -86,32 +133,35 @@ func init() {
         "tags": [
           "k8s-monitoring-tool"
         ],
-        "summary": "Gets all pods statistics running in the k8s cluster",
+        "summary": "Gets logs of the given pod in the given namespace.",
         "parameters": [
           {
             "type": "string",
-            "description": "Pass if pods status for a specific namespace is desired; otherwise all pods across all namespaces are returned.",
+            "description": "Namespace wherein pod resides.",
             "name": "namespace",
-            "in": "query"
+            "in": "query",
+            "required": true
           },
           {
             "type": "string",
-            "description": "Pass if you wish to fetch pods which are breaching the given cpuThreshold.",
-            "name": "cpuThreshold",
-            "in": "query"
+            "description": "Name of the pod.",
+            "name": "podName",
+            "in": "query",
+            "required": true
           },
           {
             "type": "string",
-            "description": "Pass byte value as string. Pass if you wish to fetch pods which are breaching the given memoryThreshold.",
-            "name": "memoryThreshold",
-            "in": "query"
+            "description": "Name of the container in the pod.",
+            "name": "containerName",
+            "in": "query",
+            "required": true
           }
         ],
         "responses": {
           "200": {
             "description": "Fetching of all pod status is successful.",
             "schema": {
-              "$ref": "#/definitions/Pods"
+              "type": "string"
             }
           },
           "500": {
@@ -230,6 +280,20 @@ func init() {
         },
         "replicas": {
           "description": "Provide the number of replicas to modify.",
+          "type": "string"
+        }
+      }
+    },
+    "PodLogs": {
+      "description": "pod logs",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "name.",
+          "type": "string"
+        },
+        "output": {
+          "description": "output.",
           "type": "string"
         }
       }
@@ -283,7 +347,54 @@ func init() {
   },
   "basePath": "/api/kmt",
   "paths": {
-    "/v1/pod": {
+    "/v1alpha1/pods": {
+      "get": {
+        "description": "For example:\n` + "`" + `` + "`" + `` + "`" + `\nGET /api/kmt/v1alpha1/pods\nGET /api/kmt/v1alpha1/pods?namespace=databricks\nGET /api/kmt/v1alpha1/pods?namespace=databricks\u0026cpuThreshold=3\u0026memoryThreshold=1073741824\n` + "`" + `` + "`" + `` + "`" + `\n\nReturns list of pods with their status:\n` + "`" + `` + "`" + `` + "`" + `\n[\n  {\n    \"name\": \"pod-1\",\n    \"namespace\": \"databricks\",\n    \"labels\": \"app:pod-1\",\n    \"status\": {\n      \"phase\": \"Running\",\n      \"description\": \"Pod is running\",\n      \"podIp\": \"192.1.1.1\",\n      \"hostIp\": \"string\"\n    },\n    \"containers\": [\n       {\n         \"name\": \"container-0\",\n         \"currentCpuUsage\": \"\",\n         \"currentMemoryUsage\": \"\"\n       }\n     ]\n  },\n  {\n    \"name\": \"pod-2\",\n    \"namespace\": \"databricks\",\n    \"labels\": \"app:pod-2\",\n    \"status\": {\n      \"phase\": \"Pending\",\n      \"description\": \"Pending due to lack of resources\",\n      \"podIp\": \"\",\n      \"hostIp\": \"\"\n    },\n   \"containers\": [\n      {\n        \"name\": \"container-1\",\n        \"currentCpuUsage\": \"\",\n        \"currentMemoryUsage\": \"\"\n      }\n    ]\n  },\n  ...\n]\n` + "`" + `` + "`" + `` + "`" + `\n",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "k8s-monitoring-tool"
+        ],
+        "summary": "Gets all pods statistics running in the k8s cluster",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Pass if pods status for a specific namespace is desired; otherwise all pods across all namespaces are returned.",
+            "name": "namespace",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Pass if you wish to fetch pods which are breaching the given cpuThreshold.",
+            "name": "cpuThreshold",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Pass byte value as string. Pass if you wish to fetch pods which are breaching the given memoryThreshold.",
+            "name": "memoryThreshold",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Fetching of all pod status is successful.",
+            "schema": {
+              "$ref": "#/definitions/Pods"
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
       "put": {
         "description": "For example:\n` + "`" + `` + "`" + `` + "`" + `\nPUT /api/kmt/v1/pod\n` + "`" + `` + "`" + `` + "`" + `\n\nSample request body will be:\n\n` + "`" + `` + "`" + `` + "`" + `\n{\n  \"name\": \"apache-cassandra\",\n  \"namespace\": \"default\",\n  \"replicas\": \"5\",\n  \"image\": \"ccas-apache:2.5\"\n}\n` + "`" + `` + "`" + `` + "`" + `\n",
         "consumes": [
@@ -328,9 +439,9 @@ func init() {
         }
       }
     },
-    "/v1/pods": {
+    "/v1alpha1/pods/log": {
       "get": {
-        "description": "For example:\n` + "`" + `` + "`" + `` + "`" + `\nGET /api/kmt/v1/pods\nGET /api/kmt/v1/pods?namespace=databricks\nGET /api/kmt/v1/pods?namespace=databricks\u0026cpuThreshold=3\u0026memoryThreshold=1073741824\n` + "`" + `` + "`" + `` + "`" + `\n\nReturns list of pods with their status:\n` + "`" + `` + "`" + `` + "`" + `\n[\n  {\n    \"name\": \"pod-1\",\n    \"namespace\": \"databricks\",\n    \"labels\": \"app:pod-1\",\n    \"status\": {\n      \"phase\": \"Running\",\n      \"description\": \"Pod is running\",\n      \"podIp\": \"192.1.1.1\",\n      \"hostIp\": \"string\"\n    },\n    \"containers\": [\n       {\n         \"name\": \"container-0\",\n         \"currentCpuUsage\": \"\",\n         \"currentMemoryUsage\": \"\"\n       }\n     ]\n  },\n  {\n    \"name\": \"pod-2\",\n    \"namespace\": \"databricks\",\n    \"labels\": \"app:pod-2\",\n    \"status\": {\n      \"phase\": \"Pending\",\n      \"description\": \"Pending due to lack of resources\",\n      \"podIp\": \"\",\n      \"hostIp\": \"\"\n    },\n   \"containers\": [\n      {\n        \"name\": \"container-1\",\n        \"currentCpuUsage\": \"\",\n        \"currentMemoryUsage\": \"\"\n      }\n    ]\n  },\n  ...\n]\n` + "`" + `` + "`" + `` + "`" + `\n",
+        "description": "For example:\n` + "`" + `` + "`" + `` + "`" + `\nGET /api/kmt/v1alpha1/pods/log?namespace=databricks\u0026name=cassandra\n` + "`" + `` + "`" + `` + "`" + `\n\nReturns list of pods with their status:\n` + "`" + `` + "`" + `` + "`" + `\n` + "`" + `` + "`" + `` + "`" + `\n",
         "consumes": [
           "application/json"
         ],
@@ -340,32 +451,35 @@ func init() {
         "tags": [
           "k8s-monitoring-tool"
         ],
-        "summary": "Gets all pods statistics running in the k8s cluster",
+        "summary": "Gets logs of the given pod in the given namespace.",
         "parameters": [
           {
             "type": "string",
-            "description": "Pass if pods status for a specific namespace is desired; otherwise all pods across all namespaces are returned.",
+            "description": "Namespace wherein pod resides.",
             "name": "namespace",
-            "in": "query"
+            "in": "query",
+            "required": true
           },
           {
             "type": "string",
-            "description": "Pass if you wish to fetch pods which are breaching the given cpuThreshold.",
-            "name": "cpuThreshold",
-            "in": "query"
+            "description": "Name of the pod.",
+            "name": "podName",
+            "in": "query",
+            "required": true
           },
           {
             "type": "string",
-            "description": "Pass byte value as string. Pass if you wish to fetch pods which are breaching the given memoryThreshold.",
-            "name": "memoryThreshold",
-            "in": "query"
+            "description": "Name of the container in the pod.",
+            "name": "containerName",
+            "in": "query",
+            "required": true
           }
         ],
         "responses": {
           "200": {
             "description": "Fetching of all pod status is successful.",
             "schema": {
-              "$ref": "#/definitions/Pods"
+              "type": "string"
             }
           },
           "500": {
@@ -484,6 +598,20 @@ func init() {
         },
         "replicas": {
           "description": "Provide the number of replicas to modify.",
+          "type": "string"
+        }
+      }
+    },
+    "PodLogs": {
+      "description": "pod logs",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "name.",
+          "type": "string"
+        },
+        "output": {
+          "description": "output.",
           "type": "string"
         }
       }

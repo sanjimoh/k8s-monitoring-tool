@@ -1,13 +1,18 @@
 package handler
 
 import (
+	"bytes"
 	"context"
+	"errors"
 	"fmt"
+	"io"
 	"k8s-monitoring-tool/configuration"
 	"k8s-monitoring-tool/models"
 	apiv1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/util/retry"
 	metrics "k8s.io/metrics/pkg/client/clientset/versioned"
@@ -211,6 +216,41 @@ func (kc *K8sClient) GetAllPodsUnderLoad(namespace string, cpuThreshold string, 
 	}
 
 	return pods, nil
+}
+
+func (kc *K8sClient) GetPodsLog(namespace, podName, containerName string) (string, error) {
+	req := kc.clientSet.CoreV1().Pods(namespace).GetLogs(podName, &apiv1.PodLogOptions{Container: containerName})
+	podLogs, err := req.Stream(context.TODO())
+	if err != nil {
+		return "", errors.New("error in opening stream")
+	}
+	defer podLogs.Close()
+
+	buf := new(bytes.Buffer)
+	_, err = io.Copy(buf, podLogs)
+	if err != nil {
+		return "", errors.New("error in copy information from podLogs to buf")
+	}
+
+	return buf.String(), nil
+}
+
+func (kc *K8sClient) AlertOnMatchInPodsLog(namespace, podName, containerName string) (*models.PodLogs, error) {
+	factory := informers.NewSharedInformerFactory(kc.clientSet, 0)
+	informer := factory.Core().V1().Pods().Informer()
+	stopper := make(chan struct{})
+	defer close(stopper)
+
+	informer.AddEventHandler(cache.ResourceEventHandlerFuncs{
+		AddFunc: func(obj interface{}) {
+			// "k8s.io/apimachinery/pkg/apis/meta/v1" provides an Object
+			// interface that allows us to get metadata easily
+			mObj := obj.(metav1.Object)
+			log.Printf("New Pod Added to Store: %s", mObj.GetName())
+		},
+	})
+	informer.Run(stopper)
+	return nil, nil
 }
 
 func makeStringPtr(v string) *string {
