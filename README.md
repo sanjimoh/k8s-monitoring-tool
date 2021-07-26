@@ -67,7 +67,7 @@ In both the above scenario, the returned response would look like something belo
       ...
     ]
   ```
-* PUT /api/kmt/v1/pod
+* PUT /api/kmt/v1alpha1/pod
   This endpoint will update a given pod deployment in a kubernetes cluster. Current support is limited to updation of 
   number of pod replicas and image name & version.
   Use "affinityKey" & "affinityValues" if you intend to ensure pod anti-affinity rules. In this case the pods matching
@@ -100,7 +100,7 @@ make run
 
 Now, you can make calls to the API exposed by this application - (for example)
 ```
-curl -X GET "http://127.0.0.1:30001/api/kmt/v1/pods?namespace=kube-system"
+curl -X GET "http://127.0.0.1:30001/api/kmt/v1alpha1/pods?namespace=kube-system"
 ```
 
 ## Technology Selection
