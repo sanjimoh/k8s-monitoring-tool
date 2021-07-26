@@ -12,6 +12,7 @@ The existing codebase - (more to come..)
 * Now it is also possible to update pod deployment with pod anti-affinity rules which would ensure pods are running in 
   different Kubernetes nodes. This is implemented based on Kubernetes label selectors. The pod anti-affinity rule 
   currently supported is "preferredDuringSchedulingIgnoredDuringExecution"
+* Fetch pod container logs.
 
 ## Exposed rest endpoints and payload details
 Existing codebase exposes the following endpoints -
